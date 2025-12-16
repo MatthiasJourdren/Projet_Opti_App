@@ -1,0 +1,152 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[french]{babel}
+\usepackage{geometry}
+\usepackage{setspace}
+\usepackage{xcolor}
+\usepackage{tcolorbox}
+\usepackage{titlesec}
+\usepackage{lmodern}
+\usepackage{tikz}
+\usepackage{pgf-umlcd}
+\usepackage[ruled,vlined]{algorithm2e} % Added for pseudo-code
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{hyperref}
+
+\usetikzlibrary{positioning}
+\geometry{margin=2.5cm}
+
+% --- Styles visuels ---
+\definecolor{cvblue}{HTML}{2A4D69}
+\definecolor{cvgray}{HTML}{F5F5F5}
+
+\titleformat{\section}{\normalfont\LARGE\bfseries\color{cvblue}}{}{0pt}{}
+\titleformat{\subsection}{\normalfont\Large\bfseries\color{cvblue}}{}{0pt}{}
+\setstretch{1.15}
+
+% --- Style des user stories (kept from template if needed) ---
+\tcbset{
+  mybox/.style={
+    colback=cvgray,
+    colframe=cvblue,
+    fonttitle=\bfseries,
+    coltitle=white,
+    arc=4pt,
+    boxrule=0.8pt,
+    left=8pt,
+    right=8pt,
+    top=6pt,
+    bottom=6pt,
+    before skip=8pt,
+    after skip=8pt
+  }
+}
+
+\begin{document}
+
+% ==============================
+% PAGE DE GARDE
+% ==============================
+
+\begin{titlepage}
+\centering
+\vspace*{3cm}
+
+{\Huge\textbf{Projet d'Optimisation}}\\[0.3cm]
+{\Large\textbf{Le Problème du Voyageur de Commerce (TSP)}}\\[1cm]
+
+\rule{0.6\textwidth}{1pt}\\[0.5cm]
+{\LARGE\textbf{Rapport Final}}\\[0.3cm]
+{\Large\textbf{Implémentation et Analyse d'Algorithmes}}\\
+\rule{0.6\textwidth}{1pt}\\[3cm]
+
+{\large\textbf{Master MIASHS — IMA-UCO (2025–2026)}}\\[1cm]
+{\large\textbf{Auteurs :} Matthias Jourdren / Maxence Cornu Basset / Vincent Beausoleil / Abdenbi Iabbadene / Maxime De Ferry}\\[0.3cm]
+{\large\textbf{Date :} \today}
+
+\end{titlepage}
+
+\newpage
+\tableofcontents
+\newpage
+
+\section{Introduction}
+Dans ce projet, nous nous intéressons au problème du Voyageur de Commerce (Traveling Salesperson Problem - TSP). L'objectif est de trouver le cycle hamiltonien de coût minimum dans un graphe complet pondéré.
+Nous avons implémenté et comparé quatre approches différentes :
+\begin{itemize}
+    \item Une méthode exacte (Branch and Bound)
+    \item Une heuristique constructive (Plus proche voisin)
+    \item Une heuristique de recherche locale (2-opt)
+    \item Une méta-heuristique (GRASP)
+\end{itemize}
+
+\section{Méthodes Implémentées}
+
+\subsection{Algorithme Exact : Branch and Bound}
+L'algorithme de séparation et évaluation (Branch and Bound) explore l'arbre des solutions possibles.
+\begin{itemize}
+    \item \textbf{Principe} : Exploration en profondeur d'abord (DFS). On maintient le coût du meilleur tour trouvé ("upper bound"). Si le coût partiel d'un chemin dépasse ce coût, on coupe la branche ("pruning").
+    \item \textbf{Complexité} : Dans le pire des cas, $O(n!)$, mais le pruning permet de réduire l'espace de recherche en pratique.
+\end{itemize}
+
+\begin{algorithm}[H]
+\SetAlgoLined
+\DontPrintSemicolon
+\KwData{G: Graphe}
+\KwResult{Meilleur tour, Meilleur coût}
+Fonction BranchAndBound(chemin\_courant, cout\_courant):\;
+\If{cout\_courant $\ge$ meilleur\_cout}{
+    Retourner\;
+}
+\If{tous les nœuds visités}{
+    cout\_total $\leftarrow$ cout\_courant + cout(dernier, premier)\;
+    \If{cout\_total < meilleur\_cout}{
+        meilleur\_cout $\leftarrow$ cout\_total\;
+        meilleur\_tour $\leftarrow$ chemin\_courant\;
+    }
+    Retourner\;
+}
+\ForEach{voisin non visité $v$}{
+    BranchAndBound(chemin\_courant + $v$, cout\_courant + cout(dernier, $v$))\;
+}
+\caption{Pseudo-code Branch and Bound}
+\end{algorithm}
+
+\subsection{Heuristique Constructive}
+Nous avons utilisé l'heuristique du \textbf{Plus Proche Voisin} (Nearest Neighbor).
+\begin{itemize}
+    \item \textbf{Principe} : À chaque étape, on choisit la ville non visitée la plus proche de la ville courante.
+    \item \textbf{Complexité} : $O(n^2)$.
+\end{itemize}
+
+\subsection{Recherche Locale}
+Nous avons implémenté l'algorithme \textbf{2-opt}.
+\begin{itemize}
+    \item \textbf{Principe} : On part d'une solution initiale (générée par l'heuristique constructive). On tente d'améliorer cette solution en inversant l'ordre de parcours entre deux villes $i$ et $k$ si cela réduit la distance totale.
+    \item \textbf{Complexité} : Chaque itération prend $O(n^2)$.
+\end{itemize}
+
+\subsection{Méta-heuristique GRASP}
+La procédure GRASP (Greedy Randomized Adaptive Search Procedure) combine une phase de construction aléatoire et une recherche locale.
+\begin{itemize}
+    \item \textbf{Phase 1} : Construction gloutonne randomisée. On construit une liste restreinte de candidats (RCL) contenant les meilleures villes suivantes (selon un paramètre $\alpha$). On choisit aléatoirement une ville dans cette liste.
+    \item \textbf{Phase 2} : On applique la recherche locale (2-opt) sur la solution construite.
+    \item Ces deux phases sont répétées un certain nombre de fois et on garde la meilleure solution globale.
+\end{itemize}
+
+\section{Expérimentations et Résultats}
+% À compléter avec les graphiques et tableaux de résultats
+
+\subsection{Protocole}
+Les tests ont été effectués sur un ordinateur [Spécifications].
+Nous avons utilisé des instances de taille variable pour comparer les temps d'exécution et la qualité des solutions.
+
+\subsection{Comparaison des Performances}
+% Insérer ici les comparaisons (Exact vs Heuristiques)
+
+\section{Conclusion}
+% Synthèse des résultats
+
+\end{document}
