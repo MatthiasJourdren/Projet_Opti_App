@@ -22,26 +22,35 @@ Each algorithm can be run from the command line from the root of the project.
 ### Exact Method
 
 ```bash
+python3 src/exact/tsp_exact.py <path_to_instance>
+```
+
+Example:
+
+```bash
 python3 src/exact/tsp_exact.py instances/exact/test.in
 ```
 
 ### Constructive Heuristic
 
 ```bash
-python3 src/constructive/tsp_constructive.py instances/constructive/test.in
+python3 src/constructive/tsp_constructive.py Data/17.in
 ```
 
 ### Local Search
 
 ```bash
-python3 src/local_search/tsp_local_search.py instances/local_search/test.in
+python3 src/local_search/tsp_local_search.py Data/17.in
 ```
 
 ### GRASP
 
 ```bash
-python3 src/grasp/tsp_grasp.py instances/grasp/test.in
+python3 src/grasp/tsp_grasp.py Data/17.in
 ```
+
+> [!NOTE]
+> Ensure you are using `python3`. The `Data` directory contains additional instances you can test with.
 
 ## Input Format
 
