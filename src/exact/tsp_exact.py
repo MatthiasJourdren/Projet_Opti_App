@@ -1,5 +1,6 @@
 import sys
 import os
+import time
 
 # Add src to python path to import model
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..'))
@@ -17,12 +18,24 @@ class TSPSolverExact:
         # Start at node 0
         self.visited[0] = True
 
-    def solve(self):
-        # Path starts with node 0
-        self._branch_and_bound([0], 0)
+        # Default 5 minutes timeout
+        self.timeout = 300 
+        self.start_time = None
+
+    def solve(self, timeout=300):
+        self.timeout = timeout
+        self.start_time = time.time()
+        try:
+            # Path starts with node 0
+            self._branch_and_bound([0], 0)
+        except TimeoutError:
+            print("Time limit reached")
         return self.best_path, self.best_cost
 
     def _branch_and_bound(self, current_path, current_cost):
+        if time.time() - self.start_time > self.timeout:
+            raise TimeoutError()
+
         # Pruning
         if current_cost >= self.best_cost:
             return

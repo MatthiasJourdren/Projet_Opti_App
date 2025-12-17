@@ -53,7 +53,7 @@ def main():
     parser.add_argument("--instances", default="Data", help="Directory containing .in files")
     parser.add_argument("--output", default="results.csv", help="Output CSV file")
     parser.add_argument("--max-instances", type=int, default=None, help="Max number of instances to test per algorithm")
-    parser.add_argument("--timeout", type=int, default=60, help="Timeout in seconds per run")
+    parser.add_argument("--timeout", type=int, default=300, help="Timeout in seconds per run")
     args = parser.parse_args()
 
     # Find instances
