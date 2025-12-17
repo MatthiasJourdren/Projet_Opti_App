@@ -1,0 +1,9 @@
+Instance,Algorithm,Status,Time,Cost,Error
+100.in,Exact,Timeout,60.0000,,
+100.in,Constructive,Success,0.0297,27807.0,
+100.in,LocalSearch,Success,1.9423,22437.0,
+100.in,GRASP,Timeout,60.0000,,
+101.in,Exact,Timeout,60.0000,,
+101.in,Constructive,Success,0.0327,803.0,
+101.in,LocalSearch,Success,1.8344,658.0,
+101.in,GRASP,Timeout,60.0000,,

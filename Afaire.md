@@ -5,7 +5,7 @@ Basé sur l'analyse du sujet et du code actuel.
 ## 1. Expérimentations & Réglage des Paramètres
 
 - [ ] **Justifier les paramètres** : Mettre en place des expériences pour "prouver" que les valeurs choisies (ex: `alpha`, `iterations`) sont les meilleures.
-- [ ] **Automatisation** : Créer des scripts pour lancer les tests sur plusieurs instances et collecter les résultats (CSV/JSON).
+- [x] **Automatisation** : Créer des scripts pour lancer les tests sur plusieurs instances et collecter les résultats (CSV/JSON).
 - [ ] **Comparaisons** :
   - [ ] Temps d'exécution vs Complexité théorique.
   - [ ] Qualité de solution vs Taille d'entrée (et autres paramètres).
@@ -13,7 +13,7 @@ Basé sur l'analyse du sujet et du code actuel.
 
 ## 2. Cas Pathologiques
 
-- [ ] **Identifier ou Créer** des instances où les heuristiques échouent ou donnent de mauvais résultats par rapport à l'optimal.
+- [x] **Identifier ou Créer** des instances où les heuristiques échouent ou donnent de mauvais résultats par rapport à l'optimal.
 - [ ] Documenter ces cas et l'écart type d'erreur.
 
 ## 3. Rapport (Dossier `report/`)

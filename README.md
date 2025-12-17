@@ -11,7 +11,7 @@
   - `exact/`: Branch and Bound algorithm
   - `constructive/`: Constructive heuristic
   - `local_search/`: Local search heuristic
-  - `grasp/`: GRASP meta-heuristic
+  - `grasp/`: GRASP meta-heuristic (Note: Used instead of Tabu Search as per Section 5 of requirements)
 - `instances/`: Test instances and results
 - `report/`: Project report
 
@@ -59,3 +59,23 @@ The input file must contain `n` (number of vertices) on the first line, followed
 ## Output Format
 
 The program will generate a file named `{input_filename}_{method}.out` in the same directory as the input file, containing the tour and the total cost.
+
+## Automation & Tools
+
+### Benchmark
+
+To run all algorithms on the instances and generate a CSV report:
+
+```bash
+python3 benchmark.py --instances Data --output results.csv --max-instances 5
+```
+
+### Pathological Instances
+
+To generate "trap" instances designed to challenge constructive heuristics:
+
+```bash
+python3 generate_pathological.py
+```
+
+This will create instances in `instances/pathological/`.
