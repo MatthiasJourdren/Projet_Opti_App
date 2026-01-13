@@ -9,7 +9,7 @@ Basé sur l'analyse du sujet et du code actuel.
 - [ ] **Comparaisons** :
   - [ ] Temps d'exécution vs Complexité théorique.
   - [ ] Qualité de solution vs Taille d'entrée (et autres paramètres).
-  - [ ] Comparaison entre les méthodes (Constructive vs Local Search vs GRASP vs Exact).
+  - [ ] Comparaison entre les méthodes (Constructive vs Local Search vs GRASP-LS vs Exact).
 
 ## 2. Cas Pathologiques
 

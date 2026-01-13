@@ -11,7 +11,7 @@
   - `exact/`: Branch and Bound algorithm
   - `constructive/`: Constructive heuristic
   - `local_search/`: Local search heuristic
-  - `grasp/`: GRASP meta-heuristic (Note: Used instead of Tabu Search as per Section 5 of requirements)
+  - `grasp/`: GRASP-LS meta-heuristic (Note: Used instead of Tabu Search as per Section 5 of requirements)
 - `instances/`: Test instances and results
 - `report/`: Project report
 
@@ -43,10 +43,10 @@ python3 src/constructive/tsp_constructive.py Data/17.in
 python3 src/local_search/tsp_local_search.py Data/17.in
 ```
 
-### GRASP
+### GRASP-LS
 
 ```bash
-python3 src/grasp/tsp_grasp.py Data/17.in
+python3 src/grasp/tsp_grasp_ls.py Data/17.in
 ```
 
 > [!NOTE]

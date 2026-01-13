@@ -11,7 +11,7 @@ ALGORITHMS = {
     "Exact": "src/exact/tsp_exact.py",
     "Constructive": "src/constructive/tsp_constructive.py",
     "LocalSearch": "src/local_search/tsp_local_search.py",
-    "GRASP": "src/grasp/tsp_grasp.py"
+    "GRASP_LS": "src/grasp/tsp_grasp_ls.py"
 }
 
 def get_algorithm_command(algo_name, instance_path):

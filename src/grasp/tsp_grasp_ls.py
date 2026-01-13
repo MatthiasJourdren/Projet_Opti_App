@@ -62,7 +62,7 @@ def randomized_nearest_neighbor(graph, alpha=0.1):
     
     return path, cost
 
-def grasp(graph, max_iterations=50, alpha=0.2):
+def grasp_ls(graph, max_iterations=50, alpha=0.2):
     best_tour = []
     best_cost = float('inf')
     
@@ -84,7 +84,7 @@ def grasp(graph, max_iterations=50, alpha=0.2):
 
 def main():
     if len(sys.argv) < 2:
-        print("Usage: python src/grasp/tsp_grasp.py <input_file>")
+        print("Usage: python src/grasp/tsp_grasp_ls.py <input_file>")
         sys.exit(1)
 
     input_filepath = sys.argv[1]
@@ -96,12 +96,12 @@ def main():
         
         # Parameters (could be args)
         # alpha and max_iterations can be tuned.
-        tour, cost = grasp(graph, max_iterations=20, alpha=0.3)
+        tour, cost = grasp_ls(graph, max_iterations=20, alpha=0.3)
         
         print(f"Tour: {tour}")
         print(f"Cost: {cost}")
         
-        write_solution(input_filepath, "grasp", tour, cost)
+        write_solution(input_filepath, "grasp_ls", tour, cost)
         
     except Exception as e:
         print(f"Error: {e}")
