@@ -45,7 +45,7 @@
 \rule{0.6\textwidth}{1pt}\\[3cm]
 
 {\large\textbf{Master MIASHS — IMA-UCO (2025–2026)}}\\[1cm]
-{\large\textbf{Auteurs :} Matthias Jourdren / Maxence Cornu Basset / Vincent Beausoleil / Abdenbi Iabbadene / Maxime De Ferry}\\[0.3cm]
+{\large\textbf{Auteurs :} Matthias Jourdren / Maxence Cornu Basset / Gaëtan Pezas}\\[0.3cm]
 {\large\textbf{Date :} \today}
 
 \end{titlepage}
@@ -64,7 +64,8 @@ Nous avons implémenté et comparé quatre approches différentes :
     \item Une méthode exacte (Branch and Bound)
     \item Une heuristique constructive (Plus proche voisin)
     \item Une heuristique de recherche locale (2-opt)
-    \item Une méta-heuristique (GRASP)
+    \item Une heuristique de recherche locale (2-opt)
+    \item Une méta-heuristique (GRASP\_LS)
 \end{itemize}
 
 \section{Méthodes Implémentées}
@@ -77,24 +78,24 @@ L'algorithme de séparation et évaluation (Branch and Bound) explore l'arbre de
 \begin{algorithm}[H]
 \SetAlgoLined
 \DontPrintSemicolon
-\KwData{chemin\_actuel, cout\_actuel}
-\If{cout\_actuel $\ge$ meilleur\_cout}{
-    Retourner (Élagage)\;
+\KwData{current\_path, current\_cost}
+\If{current\_cost $\ge$ best\_cost}{
+    Return (Pruning)\;
 }
-\If{longueur(chemin\_actuel) == N}{
-    cout\_total $\leftarrow$ cout\_actuel + distance(dernier, depart)\;
-    \If{cout\_total < meilleur\_cout}{
-        meilleur\_cout $\leftarrow$ cout\_total\;
-        meilleur\_tour $\leftarrow$ copie(chemin\_actuel)\;
+\If{length(current\_path) == N}{
+    total\_cost $\leftarrow$ current\_cost + distance(last, start)\;
+    \If{total\_cost < best\_cost}{
+        best\_cost $\leftarrow$ total\_cost\;
+        best\_tour $\leftarrow$ copy(current\_path)\;
     }
-    Retourner\;
+    Return\;
 }
-\ForEach{ville suivante $v$ non visitée}{
-    Marquer $v$ comme visitée\;
-    BranchAndBound(chemin\_actuel + $v$, cout\_actuel + distance(dernier, $v$))\;
-    Marquer $v$ comme non visitée\;
+\ForEach{unvisited next city $v$}{
+    Mark $v$ as visited\;
+    BranchAndBound(current\_path + $v$, current\_cost + distance(last, $v$))\;
+    Mark $v$ as unvisited\;
 }
-\caption{Pseudo-code Branch and Bound}
+\caption{Branch and Bound Pseudocode}
 \end{algorithm}
 
 \subsection{Heuristique Constructive : Plus Proche Voisin}
@@ -105,17 +106,17 @@ Cette approche gloutonne construit une solution en choisissant toujours la ville
 \begin{algorithm}[H]
 \SetAlgoLined
 \DontPrintSemicolon
-Choisir ville\_depart (ex: 0)\;
-ville\_actuelle $\leftarrow$ ville\_depart\;
-Marquer ville\_actuelle comme visitée\;
-\While{il reste des villes non visitées}{
-    Trouver ville\_suivante non visitée la plus proche de ville\_actuelle\;
-    Ajouter ville\_suivante au chemin\;
-    cout\_total $\leftarrow$ cout\_total + distance(ville\_actuelle, ville\_suivante)\;
-    ville\_actuelle $\leftarrow$ ville\_suivante\;
+Choisir start\_city (eg: 0)\;
+current\_city $\leftarrow$ start\_city\;
+Mark current\_city as visited\;
+\While{there are unvisited cities}{
+    Find unvisited next\_city closest to current\_city\;
+    Add next\_city to path\;
+    total\_cost $\leftarrow$ total\_cost + distance(current\_city, next\_city)\;
+    current\_city $\leftarrow$ next\_city\;
 }
-cout\_total $\leftarrow$ cout\_total + distance(ville\_actuelle, ville\_depart)\;
-\caption{Pseudo-code Plus Proche Voisin}
+total\_cost $\leftarrow$ total\_cost + distance(current\_city, start\_city)\;
+\caption{Nearest Neighbor Pseudocode}
 \end{algorithm}
 
 \subsection{Recherche Locale : 2-opt}
@@ -126,40 +127,40 @@ L'algorithme 2-opt améliore une solution existante en inversant des segments du
 \begin{algorithm}[H]
 \SetAlgoLined
 \DontPrintSemicolon
-amélioration $\leftarrow$ Vrai\;
-\While{amélioration}{
-    amélioration $\leftarrow$ Faux\;
-    \For{i de 1 à N-2}{
-        \For{k de i+1 à N-1}{
-            nouveau\_tour $\leftarrow$ InverserSegment(tour\_initial, i, k)\;
-            \If{cout(nouveau\_tour) < cout(tour\_initial)}{
-                tour\_initial $\leftarrow$ nouveau\_tour\;
-                amélioration $\leftarrow$ Vrai\;
-                Sortir des boucles de parcours (First Improvement)\;
+improvement $\leftarrow$ True\;
+\While{improvement}{
+    improvement $\leftarrow$ False\;
+    \For{i from 1 to N-2}{
+        \For{k from i+1 to N-1}{
+            new\_tour $\leftarrow$ ReverseSegment(initial\_tour, i, k)\;
+            \If{cost(new\_tour) < cost(initial\_tour)}{
+                initial\_tour $\leftarrow$ new\_tour\;
+                improvement $\leftarrow$ True\;
+                Exit loops (First Improvement)\;
             }
         }
     }
 }
-\caption{Pseudo-code Recherche Locale 2-opt}
+\caption{2-opt Local Search Pseudocode}
 \end{algorithm}
 
 \newpage
-\subsection{Méta-heuristique : GRASP}
-La procédure GRASP (\textit{Greedy Randomized Adaptive Search Procedure}) combine construction aléatoire et recherche locale.
+\subsection{Méta-heuristique : GRASP\_LS}
+La procédure GRASP\_LS (\textit{Greedy Randomized Adaptive Search Procedure}) combine construction aléatoire et recherche locale.
 
 \textbf{Complexité :} $O(I \times (n^2 + \text{itérations\_2opt}))$, avec $I$ itérations.
 
 \begin{algorithm}[H]
 \SetAlgoLined
 \DontPrintSemicolon
-\For{i de 1 à max\_itérations}{
-    Solution $\leftarrow$ ConstructionAléatoireGourmande(alpha)\;
-    Solution $\leftarrow$ RechercheLocale2Opt(Solution)\;
-    \If{cout(Solution) < meilleur\_cout\_global}{
-        meilleur\_Solution $\leftarrow$ Solution\;
+\For{i from 1 to max\_iterations}{
+    Solution $\leftarrow$ GreedyRandomizedConstruction(alpha)\;
+    Solution $\leftarrow$ LocalSearch2Opt(Solution)\;
+    \If{cost(Solution) < global\_best\_cost}{
+        best\_Solution $\leftarrow$ Solution\;
     }
 }
-\caption{Pseudo-code GRASP}
+\caption{GRASP\_LS Pseudocode}
 \end{algorithm}
 
 \section{Expérimentations et Résultats}
@@ -174,7 +175,7 @@ Les tests ont été effectués sur des instances de taille 20 (données types \t
 Exact (B\&B) & Timeout & > 60.0 & - & Optimale \\ \hline
 Plus Proche Voisin & Succès & ~0.03 & 100\% & Faible \\ \hline
 Recherche Locale & Succès & ~0.03 & ~95\% & Moyenne \\ \hline
-\textbf{GRASP} & Succès & ~0.12 & \textbf{~90\%} & \textbf{Excellente} \\ \hline
+\textbf{GRASP\_LS} & Succès & ~0.12 & \textbf{~90\%} & \textbf{Excellente} \\ \hline
 \end{tabular}
 \caption{Comparaison des algorithmes sur des instances de 20 villes}
 \end{table}
@@ -188,7 +189,7 @@ Recherche Locale & Succès & ~0.03 & ~95\% & Moyenne \\ \hline
 \end{enumerate}
 
 \section{Conclusion}
-L'heuristique retenue comme étant la plus efficace est \textbf{GRASP}. 
+L'heuristique retenue comme étant la plus efficace est \textbf{GRASP\_LS}. 
 Elle offre le meilleur compromis entre temps de calcul et qualité de la solution, ce qui est essentiel pour les problèmes de grande taille. Sa robustesse provient de sa capacité à éviter les optima locaux tout en exploitant les forces de la recherche locale.
 
 \end{document}
