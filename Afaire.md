@@ -20,8 +20,8 @@ Basé sur l'analyse du sujet et du code actuel.
 
 Le rapport doit être en PDF (LaTeX recommandé) et inclure :
 
-- [ ] **Explications détaillées** des algorithmes (Pseudo-code, pas de copier-coller du code python).
-- [ ] **Calcul de complexité** théorique.
+- [x] **Explications détaillées** des algorithmes (Pseudo-code, pas de copier-coller du code python).
+- [x] **Calcul de complexité** théorique.
 - [ ] **Résultats expérimentaux** : Graphiques et analyses.
 - [ ] **Justifications** des choix d'implémentation et de paramètres.
 - [ ] **Conclusion**.

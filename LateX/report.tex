@@ -10,10 +10,21 @@
 \usepackage{lmodern}
 \usepackage{tikz}
 \usepackage{pgf-umlcd}
-\usepackage[ruled,vlined]{algorithm2e} 
+\usepackage[ruled,vlined,french,onelanguage]{algorithm2e} 
 \usepackage{amsmath}
 \usepackage{graphicx}
 \usepackage{hyperref}
+
+% --- Définitions globales des mots-clés Algorithme (Français) ---
+\SetKw{KwSi}{Si}
+\SetKw{KwAlors}{Alors}
+\SetKw{KwSinon}{Sinon}
+\SetKw{KwPour}{Pour}
+\SetKw{KwPourChaque}{Pour chaque}
+\SetKw{KwTantQue}{Tant que}
+\SetKw{KwFaire}{Faire}
+\SetKw{KwRetourner}{Retourner}
+\SetKwData{Donnees}{Données}
 
 \usetikzlibrary{positioning}
 \geometry{margin=2.5cm}
@@ -71,96 +82,156 @@ Nous avons implémenté et comparé quatre approches différentes :
 \section{Méthodes Implémentées}
 
 \subsection{Algorithme Exact : Branch and Bound}
-L'algorithme de séparation et évaluation (Branch and Bound) explore l'arbre des solutions possibles tout en utilisant des bornes pour couper les branches inutiles.
+L'algorithme "Branch and Bound" est une méthode qui cherche la meilleure solution en explorant toutes les possibilités, comme dans un arbre. Pour gagner du temps, on utilise une astuce : si un début de chemin est déjà trop long par rapport au meilleur chemin complet que l'on connait, on arrête tout de suite d'explorer cette direction. On appelle cela "l'élagage". 
+Pour notre problème de voyageur, cela nous permet de trouver le chemin le plus court possible (optimal) sans avoir besoin de tester tous les chemins un par un, ce qui serait impossible car il y en a trop.
 
-\textbf{Complexité :} $O(n!)$ dans le pire des cas.
+\textbf{Complexité :} $O(n!)$.
 
 \begin{algorithm}[H]
 \SetAlgoLined
 \DontPrintSemicolon
-\KwData{current\_path, current\_cost}
-\If{current\_cost $\ge$ best\_cost}{
-    Return (Pruning)\;
+
+\KwData{chemin\_actuel (liste des villes déjà visitées), cout\_actuel (longueur du chemin)}
+
+\tcp{Condition d'arrêt (Élagage) : si on dépasse déjà le meilleur score connu}
+\KwSi{cout\_actuel $\ge$ meilleur\_cout\_trouve}{
+    \KwRetourner (On arrête cette branche, inutile de continuer)\;
 }
-\If{length(current\_path) == N}{
-    total\_cost $\leftarrow$ current\_cost + distance(last, start)\;
-    \If{total\_cost < best\_cost}{
-        best\_cost $\leftarrow$ total\_cost\;
-        best\_tour $\leftarrow$ copy(current\_path)\;
+
+\tcp{Si on a visité toutes les villes (feuille de l'arbre)}
+\KwSi{longueur(chemin\_actuel) == Nombre\_Total\_Villes}{
+    \tcp{On ajoute le retour au point de départ}
+    cout\_total $\leftarrow$ cout\_actuel + distance(derniere\_ville, ville\_depart)\;
+    
+    \tcp{Est-ce que c'est un nouveau record ?}
+    \KwSi{cout\_total < meilleur\_cout\_trouve}{
+        meilleur\_cout\_trouve $\leftarrow$ cout\_total\;
+        meilleur\_tour $\leftarrow$ copier(chemin\_actuel)\;
     }
-    Return\;
+    \KwRetourner\;
 }
-\ForEach{unvisited next city $v$}{
-    Mark $v$ as visited\;
-    BranchAndBound(current\_path + $v$, current\_cost + distance(last, $v$))\;
-    Mark $v$ as unvisited\;
+
+\tcp{Exploration des villes suivantes}
+\KwPourChaque{ville $v$ qui n'est PAS encore dans chemin\_actuel}{
+    Marquer $v$ comme visitée\;
+    \tcp{Appel récursif : on continue le chemin avec $v$}
+    BranchAndBound(chemin\_actuel + $v$, cout\_actuel + distance(derniere, $v$))\;
+    Marquer $v$ comme non visitée (pour permettre d'autres chemins)\;
 }
-\caption{Branch and Bound Pseudocode}
+\caption{Pseudo-code Branch and Bound (Détaillé)}
 \end{algorithm}
 
 \subsection{Heuristique Constructive : Plus Proche Voisin}
-Cette approche gloutonne construit une solution en choisissant toujours la ville non visitée la plus proche.
+L'algorithme du Plus Proche Voisin est très intuitif : on part d'une ville et on va toujours vers la ville la plus proche qui n'a pas encore été visitée. C'est simple et rapide.
+Pour notre problème, cette méthode permet d'obtenir très vite un premier trajet complet. Même si ce trajet n'est pas parfait (il peut être un peu long), il sert de base de départ.
 
 \textbf{Complexité :} $O(n^2)$.
 
 \begin{algorithm}[H]
 \SetAlgoLined
 \DontPrintSemicolon
-Choisir start\_city (eg: 0)\;
-current\_city $\leftarrow$ start\_city\;
-Mark current\_city as visited\;
-\While{there are unvisited cities}{
-    Find unvisited next\_city closest to current\_city\;
-    Add next\_city to path\;
-    total\_cost $\leftarrow$ total\_cost + distance(current\_city, next\_city)\;
-    current\_city $\leftarrow$ next\_city\;
+\SetKw{KwTantQue}{Tant que}
+\SetKw{KwFaire}{Faire}
+
+\tcp{Initialisation}
+Choisir une ville de départ arbitraire (ex: ville 0)\;
+ville\_actuelle $\leftarrow$ ville\_depart\;
+Marquer ville\_actuelle comme "VISITÉE"\;
+chemin $\leftarrow$ [ville\_actuelle]\;
+cout\_total $\leftarrow$ 0\;
+
+\tcp{Boucle principale : on visite tout le monde}
+\KwTantQue{il reste des villes NON visitées}{
+    \tcp{Recherche du voisin le plus proche}
+    Trouver la ville $v$ non visitée qui a la plus petite distance avec ville\_actuelle\;
+    
+    \tcp{Mise à jour}
+    Ajouter $v$ au chemin\;
+    cout\_total $\leftarrow$ cout\_total + distance(ville\_actuelle, $v$)\;
+    ville\_actuelle $\leftarrow$ $v$ (on se déplace)\;
+    Marquer $v$ comme "VISITÉE"\;
 }
-total\_cost $\leftarrow$ total\_cost + distance(current\_city, start\_city)\;
-\caption{Nearest Neighbor Pseudocode}
+
+\tcp{Ne pas oublier de revenir au point de départ !}
+cout\_total $\leftarrow$ cout\_total + distance(ville\_actuelle, ville\_depart)\;
+Ajouter ville\_depart à la fin du chemin\;
+
+\caption{Pseudo-code Plus Proche Voisin (Détaillé)}
 \end{algorithm}
 
 \subsection{Recherche Locale : 2-opt}
-L'algorithme 2-opt améliore une solution existante en inversant des segments du tour pour éliminer les croisements d'arêtes.
+Le 2-opt est une technique pour corriger les défauts d'un trajet existant. Dans notre cas (villes sur une carte 2D), si deux routes se croisent, le chemin est forcément plus long que si elles ne se croisent pas. 
+Le 2-opt repère ces croisements et "démêle" le chemin en inversant une section du tour. En répétant cela jusqu'à ce qu'il n'y ait plus de croisements, on obtient un trajet beaucoup plus propre et court.
 
-\textbf{Complexité :} $O(n^2)$ par itération.
+\textbf{Complexité :} $O(n^2)$.
 
 \begin{algorithm}[H]
 \SetAlgoLined
 \DontPrintSemicolon
-improvement $\leftarrow$ True\;
-\While{improvement}{
-    improvement $\leftarrow$ False\;
-    \For{i from 1 to N-2}{
-        \For{k from i+1 to N-1}{
-            new\_tour $\leftarrow$ ReverseSegment(initial\_tour, i, k)\;
-            \If{cost(new\_tour) < cost(initial\_tour)}{
-                initial\_tour $\leftarrow$ new\_tour\;
-                improvement $\leftarrow$ True\;
-                Exit loops (First Improvement)\;
+\SetKw{KwPour}{Pour}
+\SetKw{KwSi}{Si}
+\SetKw{KwAlors}{Alors}
+\SetKw{KwTantQue}{Tant que}
+\tcp{On part d'un tour existant (même mauvais)}
+amelioration\_trouvee $\leftarrow$ Vrai\;
+
+\KwTantQue{amelioration\_trouvee est Vrai}{
+    amelioration\_trouvee $\leftarrow$ Faux (on remet à faux pour ce tour)\;
+    
+    \tcp{On teste toutes les paires d'arêtes possibles (i et k)}
+    \KwPour{i de 1 à N-2}{
+        \KwPour{k de i+1 à N-1}{
+            \tcp{On simule l'inversion du segment entre i et k}
+            nouveau\_tour $\leftarrow$ InverserSegment(tour\_actuel, i, k)\;
+            
+            \tcp{Est-ce que ça a raccourci le trajet ?}
+            \KwSi{cout(nouveau\_tour) < cout(tour\_actuel)}{
+                tour\_actuel $\leftarrow$ nouveau\_tour (On valide le changement)\;
+                amelioration\_trouvee $\leftarrow$ Vrai\;
+                \tcp{On recommence la boucle principale pour revérifier}
+                Sortir des boucles "Pour" et recommencer le "Tant que"\;
             }
         }
     }
 }
-\caption{2-opt Local Search Pseudocode}
+\KwRetourner tour\_actuel\;
+\caption{Pseudo-code Recherche Locale 2-opt (Détaillé)}
 \end{algorithm}
 
 \newpage
 \subsection{Méta-heuristique : GRASP\_LS}
-La procédure GRASP\_LS (\textit{Greedy Randomized Adaptive Search Procedure}) combine construction aléatoire et recherche locale.
+La méthode GRASP mélange hasard et optimisation pour trouver une solution excellente.
+Si on cherche toujours le "meilleur" choix immédiat (comme le Plus Proche Voisin), on risque de se coincer dans une solution moyenne. 
+GRASP construit une solution en choisissant parfois un ville un peu moins bonne au hasard, ce qui permet d'explorer des chemins différents. Ensuite, on applique le 2-opt pour améliorer ce chemin à fond. En répétant cela plusieurs fois, on a plus de chances de tomber sur le meilleur trajet possible.
 
-\textbf{Complexité :} $O(I \times (n^2 + \text{itérations\_2opt}))$, avec $I$ itérations.
+\textbf{Complexité :} Dépend du nombre de fois qu'on répète l'algorithme.
 
 \begin{algorithm}[H]
 \SetAlgoLined
 \DontPrintSemicolon
-\For{i from 1 to max\_iterations}{
-    Solution $\leftarrow$ GreedyRandomizedConstruction(alpha)\;
-    Solution $\leftarrow$ LocalSearch2Opt(Solution)\;
-    \If{cost(Solution) < global\_best\_cost}{
-        best\_Solution $\leftarrow$ Solution\;
+\SetKw{KwPour}{Pour}
+\SetKw{KwSi}{Si}
+\SetKwData{Meilleur}{Global}
+
+meilleur\_cout\_global $\leftarrow$ Infini\;
+meilleure\_solution\_globale $\leftarrow$ Vide\;
+
+\KwPour{iteration de 1 à Nombre\_Max\_Iterations}{
+    \tcp{Étape 1 : Construction semi-aléatoire}
+    \tcp{alpha = 0 (glouton pur) à 1 (totalement aléatoire)}
+    Solution\_Candidate $\leftarrow$ ConstructionGloutonneAleatoire(alpha)\;
+    
+    \tcp{Étape 2 : Optimisation locale}
+    Solution\_Optimisee $\leftarrow$ RechercheLocale2Opt(Solution\_Candidate)\;
+    
+    \tcp{Mise à jour du record}
+    \KwSi{cout(Solution\_Optimisee) < meilleur\_cout\_global}{
+        meilleur\_cout\_global $\leftarrow$ cout(Solution\_Optimisee)\;
+        meilleure\_solution\_globale $\leftarrow$ Solution\_Optimisee\;
     }
 }
-\caption{GRASP\_LS Pseudocode}
+\KwRetourner meilleure\_solution\_globale\;
+\caption{Pseudo-code GRASP\_LS (Détaillé)}
 \end{algorithm}
 
 \section{Expérimentations et Résultats}
