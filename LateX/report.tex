@@ -1,58 +1,59 @@
 \documentclass[12pt,a4paper]{article}
+
+% ==============================
+% PACKAGES
+% ==============================
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage[french]{babel}
 \usepackage{geometry}
 \usepackage{setspace}
 \usepackage{xcolor}
-\usepackage{tcolorbox}
 \usepackage{titlesec}
 \usepackage{lmodern}
-\usepackage{tikz}
-\usepackage{pgf-umlcd}
-\usepackage[ruled,vlined,french,onelanguage]{algorithm2e} 
 \usepackage{amsmath}
 \usepackage{graphicx}
 \usepackage{hyperref}
+\usepackage[ruled,vlined,french,onelanguage]{algorithm2e}
 
-% --- Définitions globales des mots-clés Algorithme (Français) ---
+% ==============================
+% MISE EN PAGE
+% ==============================
+\geometry{margin=2.5cm}
+\setstretch{1.15}
+
+\definecolor{cvblue}{HTML}{2A4D69}
+
+\titleformat{\section}{\normalfont\LARGE\bfseries\color{cvblue}}{}{0pt}{}
+\titleformat{\subsection}{\normalfont\Large\bfseries\color{cvblue}}{}{0pt}{}
+
+% ==============================
+% MOTS-CLÉS ALGORITHMES
+% ==============================
 \SetKw{KwSi}{Si}
 \SetKw{KwAlors}{Alors}
 \SetKw{KwSinon}{Sinon}
 \SetKw{KwPour}{Pour}
 \SetKw{KwPourChaque}{Pour chaque}
 \SetKw{KwTantQue}{Tant que}
-\SetKw{KwFaire}{Faire}
 \SetKw{KwRetourner}{Retourner}
 \SetKwData{Donnees}{Données}
-
-\usetikzlibrary{positioning}
-\geometry{margin=2.5cm}
-
-% --- Styles visuels ---
-\definecolor{cvblue}{HTML}{2A4D69}
-\definecolor{cvgray}{HTML}{F5F5F5}
-
-\titleformat{\section}{\normalfont\LARGE\bfseries\color{cvblue}}{}{0pt}{}
-\titleformat{\subsection}{\normalfont\Large\bfseries\color{cvblue}}{}{0pt}{}
-\setstretch{1.15}
 
 \begin{document}
 
 % ==============================
 % PAGE DE GARDE
 % ==============================
-
 \begin{titlepage}
 \centering
 \vspace*{3cm}
 
-{\Huge\textbf{Projet d'Optimisation}}\\[0.3cm]
-{\Large\textbf{Le Problème du Voyageur de Commerce (TSP)}}\\[1cm]
+{\Huge\textbf{Projet d’Optimisation}}\\[0.3cm]
+{\Large\textbf{Problème du Voyageur de Commerce (TSP)}}\\[1cm]
 
 \rule{0.6\textwidth}{1pt}\\[0.5cm]
 {\LARGE\textbf{Rapport Final}}\\[0.3cm]
-{\Large\textbf{Implémentation et Analyse d'Algorithmes}}\\
+{\Large\textbf{Algorithmes Exactes et Heuristiques}}\\
 \rule{0.6\textwidth}{1pt}\\[3cm]
 
 {\large\textbf{Master MIASHS — IMA-UCO (2025–2026)}}\\[1cm]
@@ -65,202 +66,185 @@
 \tableofcontents
 \newpage
 
-\section{Introduction et Énoncé du Problème}
-Le Problème du Voyageur de Commerce (\textbf{Traveling Salesperson Problem - TSP}) est l'un des problèmes d'optimisation combinatoire les plus célèbres. 
+% ==============================
+\section{Introduction}
 
-L'objectif est de trouver le chemin le plus court qui visite chaque ville exactement une fois et revient au point de départ. Mathématiquement, cela revient à chercher un \textbf{cycle hamiltonien de poids minimum} dans un graphe complet pondéré $G = (V, E)$. Le TSP est classé comme \textbf{NP-difficile}.
+Le Problème du Voyageur de Commerce (\textbf{Traveling Salesperson Problem – TSP}) est un problème classique d’optimisation combinatoire.  
+Il consiste à déterminer la tournée de coût minimal permettant de visiter chaque ville exactement une fois et de revenir à la ville de départ.
 
-Nous avons implémenté et comparé quatre approches différentes :
-\begin{itemize}
-    \item Une méthode exacte (Branch and Bound)
-    \item Une heuristique constructive (Plus proche voisin)
-    \item Une heuristique de recherche locale (2-opt)
-    \item Une heuristique de recherche locale (2-opt)
-    \item Une méta-heuristique (GRASP\_LS)
-\end{itemize}
+Ce problème est connu pour sa difficulté algorithmique, car il appartient à la classe des problèmes \textbf{NP-difficiles}.  
+Dans ce projet, plusieurs approches ont été implémentées afin de comparer leurs performances et leur qualité de solution.
 
+% ==============================
 \section{Méthodes Implémentées}
 
-\subsection{Algorithme Exact : Branch and Bound}
-L'algorithme "Branch and Bound" est une méthode qui cherche la meilleure solution en explorant toutes les possibilités, comme dans un arbre. Pour gagner du temps, on utilise une astuce : si un début de chemin est déjà trop long par rapport au meilleur chemin complet que l'on connait, on arrête tout de suite d'explorer cette direction. On appelle cela "l'élagage". 
-Pour notre problème de voyageur, cela nous permet de trouver le chemin le plus court possible (optimal) sans avoir besoin de tester tous les chemins un par un, ce qui serait impossible car il y en a trop.
+% =====================================================
+\subsection{Heuristique constructive : Plus proche voisin}
 
-\textbf{Complexité :} $O(n!)$.
+Dans notre implémentation du TSP, nous avons adapté l’heuristique du plus proche voisin avec un graphe complet pondéré représentant les villes et leurs distances. La tournée est construite à partir d’une ville de départ fixée (la ville 0), en ajoutant à chaque étape une ville non encore visitée. Les distances sont directement lues dans la matrice d’adjacence fournie en entrée.
+
+Les villes déjà visitées sont mémorisées afin de garantir que chaque sommet n’est visité qu’une seule fois. Une fois toutes les villes intégrées à la tournée, le coût du retour vers la ville de départ est ajouté afin d’obtenir un cycle hamiltonien valide. Cette méthode fournit rapidement une solution réalisable, qui sert également de solution initiale pour les méthodes plus avancées.
 
 \begin{algorithm}[H]
 \SetAlgoLined
 \DontPrintSemicolon
 
-\KwData{chemin\_actuel (liste des villes déjà visitées), cout\_actuel (longueur du chemin)}
+\Donnees{Matrice de distances $D$, nombre de villes $n$}
+ville\_depart $\leftarrow 0$\;
+tour $\leftarrow [ville\_depart]$\;
+Marquer ville\_depart visitée\;
+cout $\leftarrow 0$\;
 
-\tcp{Condition d'arrêt (Élagage) : si on dépasse déjà le meilleur score connu}
-\KwSi{cout\_actuel $\ge$ meilleur\_cout\_trouve}{
-    \KwRetourner (On arrête cette branche, inutile de continuer)\;
+\TantQue{toutes les villes ne sont pas visitées}{
+    ville\_suivante $\leftarrow$ ville non visitée minimisant $D[v_{courant}, v]$\;
+    Ajouter ville\_suivante à la tournée\;
+    cout $\leftarrow$ cout + $D[v_{courant}, ville\_suivante]$\;
+    Marquer ville\_suivante visitée\;
+    $v_{courant} \leftarrow$ ville\_suivante\;
 }
 
-\tcp{Si on a visité toutes les villes (feuille de l'arbre)}
-\KwSi{longueur(chemin\_actuel) == Nombre\_Total\_Villes}{
-    \tcp{On ajoute le retour au point de départ}
-    cout\_total $\leftarrow$ cout\_actuel + distance(derniere\_ville, ville\_depart)\;
-    
-    \tcp{Est-ce que c'est un nouveau record ?}
-    \KwSi{cout\_total < meilleur\_cout\_trouve}{
-        meilleur\_cout\_trouve $\leftarrow$ cout\_total\;
-        meilleur\_tour $\leftarrow$ copier(chemin\_actuel)\;
+cout $\leftarrow$ cout + $D[v_{courant}, ville\_depart]$\;
+\KwRetourner tour, cout\;
+
+\caption{Pseudo-code de l’heuristique du plus proche voisin}
+\end{algorithm}
+
+\paragraph{Complexité}
+À chaque itération, toutes les villes non visitées sont examinées.  
+La complexité temporelle est donc :
+\[
+\mathcal{O}(n^2)
+\]
+
+% =====================================================
+\subsection{Algorithme exact : Branch and Bound}
+
+L’algorithme de Branch and Bound est adapté au TSP en explorant les permutations possibles des villes sous forme de chemins partiels construits récursivement à partir d’une ville de départ fixée. Chaque chemin partiel représente une tournée incomplète, dont le coût cumulé est calculé à partir des poids du graphe.
+
+Une borne supérieure correspond au meilleur coût trouvé jusqu’à présent. Dès que le coût partiel d’un chemin dépasse cette borne, la branche correspondante est abandonnée, ce qui permet de réduire l’espace de recherche. Afin de rendre l’algorithme exploitable en pratique, une limite de temps est imposée, ce qui permet d’interrompre la recherche pour les instances trop grandes.
+
+\begin{algorithm}[H]
+\SetAlgoLined
+\DontPrintSemicolon
+
+\Donnees{Matrice de distances $D$, nombre de villes $n$}
+meilleur\_cout $\leftarrow +\infty$\;
+
+\BlankLine
+\textbf{Procédure BnB(chemin, cout)}\;
+\Indp
+\KwSi{cout $\ge$ meilleur\_cout}{
+    \KwRetourner\;
+}
+
+\KwSi{longueur(chemin) = n}{
+    cout\_total $\leftarrow$ cout + $D[dernier, premier]$\;
+    \KwSi{cout\_total < meilleur\_cout}{
+        meilleur\_cout $\leftarrow$ cout\_total\;
     }
     \KwRetourner\;
 }
 
-\tcp{Exploration des villes suivantes}
-\KwPourChaque{ville $v$ qui n'est PAS encore dans chemin\_actuel}{
-    Marquer $v$ comme visitée\;
-    \tcp{Appel récursif : on continue le chemin avec $v$}
-    BranchAndBound(chemin\_actuel + $v$, cout\_actuel + distance(derniere, $v$))\;
-    Marquer $v$ comme non visitée (pour permettre d'autres chemins)\;
+\PourChaque{ville non visitée $v$}{
+    Marquer $v$ visitée\;
+    BnB(chemin $\cup \{v\}$, cout + $D[dernier, v]$)\;
+    Marquer $v$ non visitée\;
 }
-\caption{Pseudo-code Branch and Bound (Détaillé)}
+\Indm
+
+\BlankLine
+BnB([0], 0)\;
+
+\caption{Pseudo-code Branch and Bound pour le TSP}
 \end{algorithm}
 
-\subsection{Heuristique Constructive : Plus Proche Voisin}
-L'algorithme du Plus Proche Voisin est très intuitif : on part d'une ville et on va toujours vers la ville la plus proche qui n'a pas encore été visitée. C'est simple et rapide.
-Pour notre problème, cette méthode permet d'obtenir très vite un premier trajet complet. Même si ce trajet n'est pas parfait (il peut être un peu long), il sert de base de départ.
+\paragraph{Complexité}
+Dans le pire cas, toutes les permutations sont explorées.  
+La complexité est donc :
+\[
+\mathcal{O}(n!)
+\]
 
-\textbf{Complexité :} $O(n^2)$.
+% =====================================================
+\subsection{Heuristique de recherche locale : 2-opt}
+
+La recherche locale 2-opt est appliquée au TSP en partant d’une tournée initiale obtenue par l’heuristique constructive. La tournée est représentée comme une liste ordonnée de villes, et son coût est calculé à partir de la matrice de distances.
+
+L’adaptation repose sur l’évaluation systématique de modifications locales de la tournée, consistant à inverser des segments du parcours. Lorsqu’une modification permet de réduire le coût total, elle est acceptée et devient la nouvelle solution courante. Le processus est répété jusqu’à ce qu’aucune amélioration ne soit possible, ce qui correspond à un optimum local pour le problème du TSP.
 
 \begin{algorithm}[H]
 \SetAlgoLined
 \DontPrintSemicolon
-\SetKw{KwTantQue}{Tant que}
-\SetKw{KwFaire}{Faire}
 
-\tcp{Initialisation}
-Choisir une ville de départ arbitraire (ex: ville 0)\;
-ville\_actuelle $\leftarrow$ ville\_depart\;
-Marquer ville\_actuelle comme "VISITÉE"\;
-chemin $\leftarrow$ [ville\_actuelle]\;
-cout\_total $\leftarrow$ 0\;
+\Donnees{Tournée initiale $T$}
+amelioration $\leftarrow$ Vrai\;
 
-\tcp{Boucle principale : on visite tout le monde}
-\KwTantQue{il reste des villes NON visitées}{
-    \tcp{Recherche du voisin le plus proche}
-    Trouver la ville $v$ non visitée qui a la plus petite distance avec ville\_actuelle\;
-    
-    \tcp{Mise à jour}
-    Ajouter $v$ au chemin\;
-    cout\_total $\leftarrow$ cout\_total + distance(ville\_actuelle, $v$)\;
-    ville\_actuelle $\leftarrow$ $v$ (on se déplace)\;
-    Marquer $v$ comme "VISITÉE"\;
-}
-
-\tcp{Ne pas oublier de revenir au point de départ !}
-cout\_total $\leftarrow$ cout\_total + distance(ville\_actuelle, ville\_depart)\;
-Ajouter ville\_depart à la fin du chemin\;
-
-\caption{Pseudo-code Plus Proche Voisin (Détaillé)}
-\end{algorithm}
-
-\subsection{Recherche Locale : 2-opt}
-Le 2-opt est une technique pour corriger les défauts d'un trajet existant. Dans notre cas (villes sur une carte 2D), si deux routes se croisent, le chemin est forcément plus long que si elles ne se croisent pas. 
-Le 2-opt repère ces croisements et "démêle" le chemin en inversant une section du tour. En répétant cela jusqu'à ce qu'il n'y ait plus de croisements, on obtient un trajet beaucoup plus propre et court.
-
-\textbf{Complexité :} $O(n^2)$.
-
-\begin{algorithm}[H]
-\SetAlgoLined
-\DontPrintSemicolon
-\SetKw{KwPour}{Pour}
-\SetKw{KwSi}{Si}
-\SetKw{KwAlors}{Alors}
-\SetKw{KwTantQue}{Tant que}
-\tcp{On part d'un tour existant (même mauvais)}
-amelioration\_trouvee $\leftarrow$ Vrai\;
-
-\KwTantQue{amelioration\_trouvee est Vrai}{
-    amelioration\_trouvee $\leftarrow$ Faux (on remet à faux pour ce tour)\;
-    
-    \tcp{On teste toutes les paires d'arêtes possibles (i et k)}
-    \KwPour{i de 1 à N-2}{
-        \KwPour{k de i+1 à N-1}{
-            \tcp{On simule l'inversion du segment entre i et k}
-            nouveau\_tour $\leftarrow$ InverserSegment(tour\_actuel, i, k)\;
-            
-            \tcp{Est-ce que ça a raccourci le trajet ?}
-            \KwSi{cout(nouveau\_tour) < cout(tour\_actuel)}{
-                tour\_actuel $\leftarrow$ nouveau\_tour (On valide le changement)\;
-                amelioration\_trouvee $\leftarrow$ Vrai\;
-                \tcp{On recommence la boucle principale pour revérifier}
-                Sortir des boucles "Pour" et recommencer le "Tant que"\;
+\TantQue{amelioration}{
+    amelioration $\leftarrow$ Faux\;
+    \Pour{$i = 1$ \KwTo $n-2$}{
+        \Pour{$k = i+1$ \KwTo $n-1$}{
+            $T' \leftarrow$ inversion du segment $[i,k]$ de $T$\;
+            \KwSi{cout($T'$) < cout($T$)}{
+                $T \leftarrow T'$\;
+                amelioration $\leftarrow$ Vrai\;
+                Sortir des boucles\;
             }
         }
     }
 }
-\KwRetourner tour\_actuel\;
-\caption{Pseudo-code Recherche Locale 2-opt (Détaillé)}
+
+\KwRetourner $T$\;
+
+\caption{Pseudo-code de la recherche locale 2-opt}
 \end{algorithm}
 
-\newpage
-\subsection{Méta-heuristique : GRASP\_LS}
-La méthode GRASP mélange hasard et optimisation pour trouver une solution excellente.
-Si on cherche toujours le "meilleur" choix immédiat (comme le Plus Proche Voisin), on risque de se coincer dans une solution moyenne. 
-GRASP construit une solution en choisissant parfois un ville un peu moins bonne au hasard, ce qui permet d'explorer des chemins différents. Ensuite, on applique le 2-opt pour améliorer ce chemin à fond. En répétant cela plusieurs fois, on a plus de chances de tomber sur le meilleur trajet possible.
+\paragraph{Complexité}
+Les échanges possibles sont en $\mathcal{O}(n^2)$.  
+La complexité globale est donc :
+\[
+\mathcal{O}(n^2)
+\]
 
-\textbf{Complexité :} Dépend du nombre de fois qu'on répète l'algorithme.
+% =====================================================
+\subsection{Méta-heuristique : GRASP}
+
+La méta-heuristique GRASP est adaptée au TSP en combinant une phase constructive randomisée et une phase de recherche locale. La phase constructive repose sur une version modifiée de l’heuristique du plus proche voisin, dans laquelle le choix de la prochaine ville est effectué aléatoirement à partir d’une liste restreinte de candidats, définie à partir des distances dans le graphe.
+
+Le paramètre $\alpha$ permet de contrôler le compromis entre choix glouton et diversification. Chaque solution construite est ensuite améliorée à l’aide de la recherche locale 2-opt. Cette procédure est répétée sur un nombre fixé d’itérations, et la meilleure tournée obtenue est conservée comme solution finale pour le TSP.
 
 \begin{algorithm}[H]
 \SetAlgoLined
 \DontPrintSemicolon
-\SetKw{KwPour}{Pour}
-\SetKw{KwSi}{Si}
-\SetKwData{Meilleur}{Global}
 
-meilleur\_cout\_global $\leftarrow$ Infini\;
-meilleure\_solution\_globale $\leftarrow$ Vide\;
+\Donnees{Matrice de distances $D$, $\alpha$, nombre d’itérations $I_{max}$}
+meilleure\_solution $\leftarrow \emptyset$\;
+meilleur\_cout $\leftarrow +\infty$\;
 
-\KwPour{iteration de 1 à Nombre\_Max\_Iterations}{
-    \tcp{Étape 1 : Construction semi-aléatoire}
-    \tcp{alpha = 0 (glouton pur) à 1 (totalement aléatoire)}
-    Solution\_Candidate $\leftarrow$ ConstructionGloutonneAleatoire(alpha)\;
-    
-    \tcp{Étape 2 : Optimisation locale}
-    Solution\_Optimisee $\leftarrow$ RechercheLocale2Opt(Solution\_Candidate)\;
-    
-    \tcp{Mise à jour du record}
-    \KwSi{cout(Solution\_Optimisee) < meilleur\_cout\_global}{
-        meilleur\_cout\_global $\leftarrow$ cout(Solution\_Optimisee)\;
-        meilleure\_solution\_globale $\leftarrow$ Solution\_Optimisee\;
+\Pour{$i = 1$ \KwTo $I_{max}$}{
+    $T \leftarrow$ ConstructionRandomisée($\alpha$)\;
+    $T \leftarrow$ RechercheLocale2Opt($T$)\;
+    \KwSi{cout($T$) < meilleur\_cout}{
+        meilleur\_cout $\leftarrow$ cout($T$)\;
+        meilleure\_solution $\leftarrow T$\;
     }
 }
-\KwRetourner meilleure\_solution\_globale\;
-\caption{Pseudo-code GRASP\_LS (Détaillé)}
+
+\KwRetourner meilleure\_solution\;
+
+\caption{Pseudo-code de GRASP appliqué au TSP}
 \end{algorithm}
 
-\section{Expérimentations et Résultats}
+\paragraph{Complexité}
+Chaque itération a un coût en $\mathcal{O}(n^2)$.  
+La complexité totale est donc :
+\[
+\mathcal{O}(I_{max} \times n^2)
+\]
 
-Les tests ont été effectués sur des instances de taille 20 (données types \texttt{random} et \texttt{double\_circle}).
-
-\begin{table}[h!]
-\centering
-\begin{tabular}{|l|c|c|c|c|}
-\hline
-\textbf{Algorithme} & \textbf{Status} & \textbf{Temps (s)} & \textbf{Coût Relatif} & \textbf{Qualité} \\ \hline
-Exact (B\&B) & Timeout & > 60.0 & - & Optimale \\ \hline
-Plus Proche Voisin & Succès & ~0.03 & 100\% & Faible \\ \hline
-Recherche Locale & Succès & ~0.03 & ~95\% & Moyenne \\ \hline
-\textbf{GRASP\_LS} & Succès & ~0.12 & \textbf{~90\%} & \textbf{Excellente} \\ \hline
-\end{tabular}
-\caption{Comparaison des algorithmes sur des instances de 20 villes}
-\end{table}
-
-\subsection{Analyse}
-\begin{enumerate}
-    \item \textbf{Exact (B\&B)} : Souffre de l'explosion combinatoire. Au-delà de 15 villes, le temps d'exécution dépasse les limites raisonnables.
-    \item \textbf{Plus Proche Voisin} : Très rapide mais les choix locaux mènent souvent à des détours coûteux en fin de parcours.
-    \item \textbf{2-opt} : Indispensable pour raffiner les solutions et supprimer les intersections d'arêtes.
-    \item \textbf{GRASP} : C'est la méthode la plus performante. En explorant plusieurs zones de l'espace de recherche (randomisation) et en optimisant chaque point (2-opt), elle trouve des solutions proches de l'optimum très rapidement.
-\end{enumerate}
-
+% ==============================
 \section{Conclusion}
-L'heuristique retenue comme étant la plus efficace est \textbf{GRASP\_LS}. 
-Elle offre le meilleur compromis entre temps de calcul et qualité de la solution, ce qui est essentiel pour les problèmes de grande taille. Sa robustesse provient de sa capacité à éviter les optima locaux tout en exploitant les forces de la recherche locale.
+
+Ce travail met en évidence les compromis entre méthodes exactes et heuristiques pour le TSP.  
+L’algorithme Branch and Bound garantit l’optimalité mais devient rapidement impraticable, tandis que les heuristiques et méta-heuristiques offrent des solutions de bonne qualité en temps raisonnable.
 
 \end{document}
