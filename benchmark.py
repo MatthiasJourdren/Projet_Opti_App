@@ -51,7 +51,7 @@ def run_algorithm(algo_name, instance_path, timeout=60):
 def main():
     parser = argparse.ArgumentParser(description="Benchmark TSP algorithms")
     parser.add_argument("--instances", default="Data", help="Directory containing .in files")
-    parser.add_argument("--output", default="results.csv", help="Output CSV file")
+    parser.add_argument("--output", default="results/results.csv", help="Output CSV file")
     parser.add_argument("--max-instances", type=int, default=None, help="Max number of instances to test per algorithm")
     parser.add_argument("--timeout", type=int, default=300, help="Timeout in seconds per run")
     args = parser.parse_args()
@@ -76,6 +76,11 @@ def main():
     print(f"Found {len(instance_files)} instances. Starting benchmark...")
 
     results = []
+
+    # Ensure output directory exists
+    output_dir = os.path.dirname(args.output)
+    if output_dir and not os.path.exists(output_dir):
+        os.makedirs(output_dir)
 
     # Prepare CSV
     with open(args.output, 'w', newline='') as csvfile:

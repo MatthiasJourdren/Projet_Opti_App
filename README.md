@@ -67,8 +67,28 @@ The program will generate a file named `{input_filename}_{method}.out` in the sa
 To run all algorithms on the instances and generate a CSV report:
 
 ```bash
-python3 benchmark.py --instances Data --output results.csv --max-instances 5
+python3 benchmark.py --instances Data --max-instances 5
 ```
+
+The results will be saved by default to `results/results.csv`.
+
+### Visualization
+
+To generate performance charts (Cost and Time) from the benchmark results, use the plotting script:
+
+```bash
+python3 plot_results.py
+```
+
+This will create various plots in `results/plots/`:
+
+- **`comparison_cost.png`**: Global comparison of costs.
+- **`comparison_time.png`**: Global comparison of execution times.
+- **`performance_<Algorithm>.png`**: Detailed analysis per algorithm (Cost vs Time across instances).
+- **`instance_<dataset>.png`**: Detailed comparison for each specific dataset.
+
+> [!NOTE]
+> The plotting script requires `pandas`, `seaborn`, and `matplotlib`. If missing, install with: `pip install pandas seaborn matplotlib`.
 
 ### Pathological Instances
 
