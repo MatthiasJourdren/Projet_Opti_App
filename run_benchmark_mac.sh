@@ -19,9 +19,14 @@ if [ $? -eq 0 ]; then
     
     # Lancer la génération des courbes
     python3 plot_results.py
+
+    echo "----------------------------------------"
+    echo "      Compilation du rapport LaTeX..."
+    echo "----------------------------------------"
+    pdflatex LateX/report.tex
     
     echo ""
-    echo "✅ Terminé ! Les résultats sont dans le dossier 'results'."
+    echo "✅ Terminé ! Les résultats sont dans le dossier 'results' et le rapport est généré."
 else
     echo ""
     echo "❌ Une erreur est survenue lors du benchmark."

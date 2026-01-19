@@ -17,9 +17,14 @@ if %ERRORLEVEL% EQU 0 (
     echo ----------------------------------------
     
     python plot_results.py
+
+    echo ----------------------------------------
+    echo       Compilation du rapport LaTeX...
+    echo ----------------------------------------
+    pdflatex LateX/report.tex
     
     echo.
-    echo [OK] Termine ! Les resultats sont dans le dossier 'results'.
+    echo [OK] Termine ! Les resultats sont dans le dossier 'results' et le rapport est genere.
 ) else (
     echo.
     echo [ERREUR] Une erreur est survenue lors du benchmark.
