@@ -270,7 +270,6 @@ La complexité totale est donc :
 \section{Analyse des Résultats}
 
 Cette section présente les performances comparées des différentes méthodes implémentées pour le TSP sur plusieurs instances de test. Les résultats sont analysés en termes de coût de la tournée et de temps d’exécution.
-La méthode "Branch and bound" étant en Time Out pour les fichiers 51.in, 52.in et beaucoup trop lent sur le fichier 17.in (18 secondes), nous avons décidé de ne pas l'inclure dans les graphiques.
 
 \begin{figure}[H]
     \centering
@@ -279,7 +278,7 @@ La méthode "Branch and bound" étant en Time Out pour les fichiers 51.in, 52.in
     \label{fig:comparison_cost}
 \end{figure}
 
-Le graphique ci-dessus (\textit{figure \ref{fig:comparison_cost}}) montre que les méthodes heuristiques (Constructive, Local Search et GRASP\_LS) parviennent à trouver des solutions très proches les unes des autres sur les petites instances. Cependant, sur les instances plus complexes, la supériorité des méthodes d'amélioration se dessine.
+Le graphique ci-dessus (\textit{figure \ref{fig:comparison_cost}}) montre que les méthodes heuristiques parviennent à trouver des solutions très proches les unes des autres sur les petites instances. Cependant, sur les instances plus complexes, la supériorité des méthodes d'amélioration se dessine.
 
 \begin{figure}[H]
     \centering
@@ -288,7 +287,7 @@ Le graphique ci-dessus (\textit{figure \ref{fig:comparison_cost}}) montre que le
     \label{fig:comparison_time}
 \end{figure}
 
-L'analyse des temps d'exécution (\textit{figure \ref{fig:comparison_time}}) souligne l'explosion combinatoire de l'algorithme exact \textbf{Branch and Bound}, qui atteint la limite de temps (300 secondes) dès que le nombre de villes augmente, sans pouvoir garantir l'optimalité. À l'opposé, l'heuristique constructive est quasi-instantanée, tandis que \textbf{GRASP\_LS} présente un surcoût temporel maîtrisé par rapport à la recherche locale simple.
+L'analyse des temps d'exécution (\textit{figure \ref{fig:comparison_time}}) souligne l'explosion combinatoire de l'algorithme exact \textbf{Branch and Bound}. À l'opposé, l'heuristique constructive est quasi-instantanée, tandis que \textbf{GRASP\_LS} présente un surcoût temporel maîtrisé par rapport à la recherche locale simple.
 
 \clearpage
 % ==============================
