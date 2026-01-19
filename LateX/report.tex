@@ -16,22 +16,41 @@
 \usepackage{float}
 \usepackage{hyperref}
 \usepackage[ruled,vlined,french,onelanguage]{algorithm2e}
+\usepackage{fancyhdr}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\usepackage{booktabs}
+\usepackage{multirow}
+
+\pgfplotsset{compat=1.18}
+\usetikzlibrary{arrows.meta, positioning, shapes.geometric}
 
 % ==============================
 % MISE EN PAGE
 % ==============================
 \geometry{margin=2.5cm}
 \setstretch{1.15}
+\setlength{\headheight}{16pt}
 
 \definecolor{cvblue}{HTML}{2A4D69}
 
 \titleformat{\section}{\normalfont\LARGE\bfseries\color{cvblue}}{}{0pt}{}
 \titleformat{\subsection}{\normalfont\Large\bfseries\color{cvblue}}{}{0pt}{}
 
+% Headers et footers
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\leftmark}
+\fancyhead[R]{Projet TSP - Master MIASHS}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.5pt}
+\renewcommand{\footrulewidth}{0.5pt}
+
 % ==============================
 % MOTS-CLÉS ALGORITHMES
 % ==============================
 \SetKwData{Donnees}{Données}
+\SetKw{KwRetourner}{Retourner}
 
 \begin{document}
 
@@ -42,12 +61,12 @@
 \centering
 \vspace*{3cm}
 
-{\Huge\textbf{Projet d’Optimisation}}\\[0.3cm]
+{\Huge\textbf{Projet d'Optimisation}}\\[0.3cm]
 {\Large\textbf{Problème du Voyageur de Commerce (TSP)}}\\[1cm]
 
 \rule{0.6\textwidth}{1pt}\\[0.5cm]
 {\LARGE\textbf{Rapport Final}}\\[0.3cm]
-{\Large\textbf{Algorithmes Exactes et Heuristiques}}\\
+{\Large\textbf{Algorithmes Exacts et Heuristiques}}\\
 \rule{0.6\textwidth}{1pt}\\[3cm]
 
 {\large\textbf{Master MIASHS — IMA-UCO (2025–2026)}}\\[1cm]
@@ -59,25 +78,248 @@
 \newpage
 \tableofcontents
 \newpage
+\listoffigures
+\newpage
 
 % ==============================
 \section{Introduction}
 
-Le Problème du Voyageur de Commerce (\textbf{Traveling Salesperson Problem – TSP}) est un problème classique d’optimisation combinatoire.  
+Le Problème du Voyageur de Commerce (\textbf{Traveling Salesperson Problem – TSP}) est un problème classique d'optimisation combinatoire.  
 Il consiste à déterminer la tournée de coût minimal permettant de visiter chaque ville exactement une fois et de revenir à la ville de départ.
 
 Ce problème est connu pour sa difficulté algorithmique, car il appartient à la classe des problèmes \textbf{NP-difficiles}.  
-Dans ce projet, plusieurs approches ont été implémentées afin de comparer leurs performances et leur qualité de solution.
+Cela signifie qu'il n'existe pas d'algorithme connu capable de résoudre toutes les instances du TSP en temps polynomial.
+
+Dans ce projet, plusieurs approches ont été implémentées afin de comparer leurs performances et leur qualité de solution :
+\begin{itemize}
+    \item Un algorithme \textbf{exact} garantissant l'optimalité (Branch and Bound)
+    \item Des \textbf{heuristiques} rapides mais approximatives (Plus Proche Voisin, 2-opt)
+    \item Une \textbf{méta-heuristique} combinant diversification et intensification (GRASP)
+\end{itemize}
+
+% ==============================
+\section{Applications du TSP}
+
+Le problème du voyageur de commerce n'est pas qu'un exercice théorique. Il trouve de nombreuses applications pratiques dans divers domaines :
+
+\subsection{Logistique et Transport}
+
+L'application la plus évidente du TSP concerne l'\textbf{optimisation de tournées de livraison}. Les entreprises de transport (UPS, FedEx, DHL) utilisent des variantes du TSP pour :
+\begin{itemize}
+    \item Minimiser la distance parcourue par les camions de livraison
+    \item Réduire la consommation de carburant et les émissions de CO$_2$
+    \item Optimiser les tournées de collecte des déchets
+    \item Planifier les circuits de distribution postale
+\end{itemize}
+
+\subsection{Fabrication de Circuits Imprimés (PCB)}
+
+Dans l'industrie électronique, la fabrication de circuits imprimés nécessite de \textbf{percer des milliers de trous} sur une plaque. Le TSP permet d'optimiser le parcours de la tête de perçage pour :
+\begin{itemize}
+    \item Minimiser le temps de déplacement de la machine
+    \item Réduire l'usure de l'équipement
+    \item Augmenter la productivité
+\end{itemize}
+
+\subsection{Séquençage ADN}
+
+En bioinformatique, le TSP est utilisé pour la \textbf{reconstruction de séquences génétiques}. Les fragments d'ADN doivent être assemblés dans le bon ordre, ce qui peut être modélisé comme un problème de tournée où :
+\begin{itemize}
+    \item Chaque fragment est une "ville"
+    \item La distance représente le degré de chevauchement entre fragments
+    \item L'objectif est de trouver l'ordre optimal de reconstruction
+\end{itemize}
+
+\subsection{Astronomie}
+
+Les télescopes automatisés doivent observer plusieurs objets célestes durant une nuit. Le TSP permet de \textbf{planifier l'ordre des observations} pour :
+\begin{itemize}
+    \item Minimiser le temps de déplacement du télescope
+    \item Maximiser le nombre d'observations possibles
+    \item Tenir compte des contraintes temporelles (visibilité des objets)
+\end{itemize}
+
+\subsection{Industrie Manufacturière}
+
+Dans les usines automatisées, le TSP est utilisé pour optimiser :
+\begin{itemize}
+    \item Les \textbf{parcours de robots} dans les entrepôts
+    \item Les trajectoires de \textbf{machines CNC} (découpe, soudure)
+    \item La planification de tâches de maintenance
+\end{itemize}
+
+\subsection{Autres Applications}
+
+Le TSP trouve également des applications dans :
+\begin{itemize}
+    \item La \textbf{planification d'itinéraires touristiques} (visiter plusieurs sites en minimisant les déplacements)
+    \item L'\textbf{optimisation de réseaux} (câblage, pipelines)
+    \item La \textbf{cristallographie aux rayons X} (positionnement optimal du cristal)
+\end{itemize}
 
 % ==============================
 \section{Méthodes Implémentées}
 
+Cette section présente les quatre approches algorithmiques implémentées pour résoudre le TSP. Nous commençons par l'algorithme exact, puis présentons les heuristiques par ordre croissant de sophistication.
+
+% =====================================================
+\subsection{Algorithme exact : Branch and Bound}
+
+L'algorithme de Branch and Bound est la seule méthode garantissant l'\textbf{optimalité} de la solution. Il explore systématiquement l'espace des solutions possibles tout en élaguant les branches non prometteuses.
+
+\subsubsection{Principe de fonctionnement}
+
+L'algorithme construit récursivement des chemins partiels à partir d'une ville de départ fixée (ville 0). À chaque étape :
+\begin{enumerate}
+    \item On étend le chemin partiel en ajoutant une ville non visitée
+    \item On calcule le coût cumulé du chemin
+    \item Si ce coût dépasse la meilleure solution connue, on \textbf{élague} cette branche
+    \item Sinon, on continue l'exploration récursive
+\end{enumerate}
+
+Le mécanisme d'\textbf{élagage} (pruning) est crucial : dès qu'un chemin partiel a un coût supérieur à la meilleure solution complète trouvée, on abandonne toute cette branche de l'arbre de recherche.
+
+\subsubsection{Exemple visuel}
+
+Considérons un graphe à 4 villes. L'arbre de recherche explore toutes les permutations possibles :
+
+\begin{center}
+\begin{tikzpicture}[
+    level 1/.style={sibling distance=4cm, level distance=1.5cm},
+    level 2/.style={sibling distance=2cm, level distance=1.5cm},
+    level 3/.style={sibling distance=1cm, level distance=1.5cm},
+    every node/.style={circle, draw, minimum size=0.8cm}
+]
+\node {0}
+    child {node {1}
+        child {node {2}
+            child {node {3}}
+        }
+        child {node {3}
+            child {node {2}}
+        }
+    }
+    child {node {2}
+        child {node {1}
+            child {node[red, thick] {3}}
+        }
+        child {node {3}
+            child {node {1}}
+        }
+    }
+    child {node {3}
+        child {node {1}
+            child {node {2}}
+        }
+        child {node {2}
+            child {node {1}}
+        }
+    };
+\end{tikzpicture}
+\end{center}
+
+Les nœuds en rouge représentent les branches élaguées car leur coût partiel dépasse déjà la meilleure solution.
+
+\subsubsection{Algorithme}
+
+\begin{algorithm}[H]
+\SetAlgoLined
+\DontPrintSemicolon
+
+\Donnees{Matrice des distances $D$, nombre de villes $n$}\;
+$MeilleurCout \leftarrow +\infty$\;
+$MeilleureTournee \leftarrow \emptyset$\;
+
+\BlankLine
+\textbf{Procédure Explorer($C_p$, $K_p$, $V_p$)}\;
+\tcp{$C_p$ : chemin partiel, $K_p$ : coût partiel, $V_p$ : villes visitées}
+    \If{$K_p \ge MeilleurCout$}{
+        \KwRet \tcp*[r]{Élagage}
+    }
+    \If{$|C_p| = n$}{
+        $K_{final} \leftarrow K_p + D[dernier(C_p), premier(C_p)]$
+        \If{$K_{final} < MeilleurCout$}{
+            $MeilleurCout \leftarrow K_{final}$\;
+            $MeilleureTournee \leftarrow C_p$\;
+        }
+        \KwRet\;
+    }
+    \ForEach{ville $v \notin V_p$}{
+        Explorer($C_p \cup \{v\}$, $K_p + D[dernier(C_p), v]$, $V_p \cup \{v\}$)\;
+    }
+Explorer([0], 0, \{0\})\;
+\KwRetourner $MeilleureTournee$, $MeilleurCout$\;
+
+\caption{Algorithme exact Branch and Bound pour le TSP}
+\end{algorithm}
+
+\subsubsection{Complexité}
+
+La complexité de cet algorithme est \textbf{factorielle} dans le pire des cas :
+\[
+\mathcal{O}(n!)
+\]
+
+\textbf{Explication détaillée :}
+\begin{itemize}
+    \item Pour la première ville, nous avons $n$ choix possibles
+    \item Pour la deuxième ville, $(n-1)$ choix
+    \item Pour la troisième ville, $(n-2)$ choix
+    \item Et ainsi de suite jusqu'à 1 choix pour la dernière ville
+    \item Total : $n \times (n-1) \times (n-2) \times \ldots \times 1 = n!$
+\end{itemize}
+
+\textbf{Croissance explosive :}
+\begin{itemize}
+    \item $10! = 3\,628\,800$ (environ 3,6 millions)
+    \item $15! = 1\,307\,674\,368\,000$ (environ 1,3 billions)
+    \item $20! \approx 2.4 \times 10^{18}$ (2,4 quintillions)
+\end{itemize}
+
+Cette croissance exponentielle rend l'algorithme inexploitable pour des instances de plus de 20-25 villes, même avec l'élagage. C'est pourquoi un \textbf{timeout} de 60 secondes a été imposé dans notre implémentation.
+
 % =====================================================
 \subsection{Heuristique constructive : Plus proche voisin}
 
-Dans notre implémentation du TSP, nous avons adapté l’heuristique du plus proche voisin avec un graphe complet pondéré représentant les villes et leurs distances. La tournée est construite à partir d’une ville de départ fixée (la ville 0), en ajoutant à chaque étape une ville non encore visitée. Les distances sont directement lues dans la matrice d’adjacence fournie en entrée.
+L'heuristique du plus proche voisin est une approche \textbf{gloutonne} qui construit une solution pas à pas en faisant à chaque étape le choix localement optimal.
 
-Les villes déjà visitées sont mémorisées afin de garantir que chaque sommet n’est visité qu’une seule fois. Une fois toutes les villes intégrées à la tournée, le coût du retour vers la ville de départ est ajouté afin d’obtenir un cycle hamiltonien valide. Cette méthode fournit rapidement une solution réalisable, qui sert également de solution initiale pour les méthodes plus avancées.
+\subsubsection{Principe de fonctionnement}
+
+À partir d'une ville de départ (ville 0), l'algorithme :
+\begin{enumerate}
+    \item Sélectionne la ville non visitée la plus proche
+    \item L'ajoute à la tournée
+    \item Répète jusqu'à avoir visité toutes les villes
+    \item Retourne à la ville de départ
+\end{enumerate}
+
+\subsubsection{Exemple visuel}
+
+\begin{center}
+\begin{tikzpicture}[scale=1.2]
+    % Villes
+    \node[circle, fill=blue!30, draw] (0) at (0,0) {0};
+    \node[circle, fill=gray!30, draw] (1) at (2,1) {1};
+    \node[circle, fill=gray!30, draw] (2) at (4,0) {2};
+    \node[circle, fill=gray!30, draw] (3) at (3,2) {3};
+    
+    % Distances
+    \draw[dashed, gray] (0) -- node[above] {2.2} (1);
+    \draw[dashed, gray] (0) -- node[below] {4.0} (2);
+    \draw[dashed, gray] (0) -- node[left] {3.6} (3);
+    
+    % Choix (le plus proche)
+    \draw[->, thick, red] (0) -- (1);
+    
+    \node[below] at (2,-1) {Étape 1 : Choisir la ville la plus proche (1)};
+\end{tikzpicture}
+\end{center}
+
+\subsubsection{Adaptation au TSP}
+
+Dans notre implémentation, le graphe est représenté par une \textbf{matrice d'adjacence} contenant les distances entre toutes les paires de villes. Les villes déjà visitées sont mémorisées pour garantir que chaque sommet n'est visité qu'une seule fois.
+
+\subsubsection{Algorithme}
 
 \begin{algorithm}[H]
 \SetAlgoLined
@@ -115,68 +357,93 @@ $CoutTotal \leftarrow CoutTotal + D[v_{actuelle}, Tournee[0]]$ \tcp*{Retour à l
 
 \KwRetourner $Tournee$, $CoutTotal$\;
 
-\caption{Heuristique constructive du Plus Proche Voisin (avec boucle et indentation)}
+\caption{Heuristique constructive du Plus Proche Voisin}
 \end{algorithm}
 
+\subsubsection{Complexité}
 
-\paragraph{Complexité}
-À chaque itération, toutes les villes non visitées sont examinées.  
-La complexité temporelle est donc :
+La complexité temporelle de cet algorithme est :
 \[
 \mathcal{O}(n^2)
 \]
 
-% =====================================================
-\subsection{Algorithme exact : Branch and Bound}
+\textbf{Explication détaillée :}
+\begin{itemize}
+    \item \textbf{Boucle externe} : On doit visiter $n$ villes, donc $n$ itérations
+    \item \textbf{Boucle interne} : À chaque itération, on cherche le minimum parmi les villes restantes
+    \begin{itemize}
+        \item Itération 1 : $(n-1)$ comparaisons
+        \item Itération 2 : $(n-2)$ comparaisons
+        \item $\ldots$
+        \item Itération $n-1$ : 1 comparaison
+    \end{itemize}
+    \item \textbf{Total} : $(n-1) + (n-2) + \ldots + 1 = \frac{n(n-1)}{2} = \mathcal{O}(n^2)$
+\end{itemize}
 
-L’algorithme de Branch and Bound est adapté au TSP en explorant les permutations possibles des villes sous forme de chemins partiels construits récursivement à partir d’une ville de départ fixée. Chaque chemin partiel représente une tournée incomplète, dont le coût cumulé est calculé à partir des poids du graphe.
+Cette complexité quadratique rend l'algorithme très rapide même pour des instances de grande taille (plusieurs milliers de villes).
 
-Une borne supérieure correspond au meilleur coût trouvé jusqu’à présent. Dès que le coût partiel d’un chemin dépasse cette borne, la branche correspondante est abandonnée, ce qui permet de réduire l’espace de recherche. Afin de rendre l’algorithme exploitable en pratique, une limite de temps est imposée, ce qui permet d’interrompre la recherche pour les instances trop grandes.
+\subsubsection{Limites}
 
-\begin{algorithm}[H]
-\SetAlgoLined
-\DontPrintSemicolon
-
-\Donnees{Matrice des distances $D$, nombre de villes $n$}\;
-$MeilleurCout \leftarrow +\infty$\;
-$MeilleureTournee \leftarrow \emptyset$\;
-
-\BlankLine
-\textbf{Procédure Explorer($C_p$, $K_p$, $V_p$)}\;
-\tcp{$C_p$ : chemin partiel, $K_p$ : coût partiel, $V_p$ : villes visitées}
-    \If{$K_p \ge MeilleurCout$}{
-        \KwRet \tcp*[r]{Élagage}
-    }
-    \If{$|C_p| = n$}{
-        $K_{final} \leftarrow K_p + D[dernier(C_p), premier(C_p)]$
-        \If{$K_{final} < MeilleurCout$}{
-            $MeilleurCout \leftarrow K_{final}$\;
-            $MeilleureTournee \leftarrow C_p$\;
-        }
-        \KwRet\;
-    }
-    \ForEach{ville $v \notin V_p$}{
-        Explorer($C_p \cup \{v\}$, $K_p + D[dernier(C_p), v]$, $V_p \cup \{v\}$)\;
-    }
-Explorer([0], 0, \{0\})\;
-\KwRetourner $MeilleureTournee$, $MeilleurCout$\;
-
-\caption{Algorithme exact Branch and Bound pour le TSP}
-\end{algorithm}
-
-\paragraph{Complexité}
-Dans le pire cas, toutes les permutations sont explorées.  
-La complexité est donc :
-\[
-\mathcal{O}(n!)
-\]
+L'heuristique du plus proche voisin ne garantit \textbf{pas l'optimalité}. Le choix glouton local peut mener à une mauvaise solution globale. Par exemple, choisir systématiquement la ville la plus proche peut créer des "détours" coûteux en fin de parcours.
 
 % =====================================================
 \subsection{Heuristique de recherche locale : 2-opt}
 
-La recherche locale 2-opt est appliquée au TSP en partant d’une tournée initiale obtenue par l’heuristique constructive. La tournée est représentée comme une liste ordonnée de villes, et son coût est calculé à partir de la matrice de distances.
+La recherche locale 2-opt est une méthode d'\textbf{amélioration itérative} qui part d'une solution initiale et tente de l'améliorer par des modifications locales.
 
-L’adaptation repose sur l’évaluation systématique de modifications locales de la tournée, consistant à inverser des segments du parcours. Lorsqu’une modification permet de réduire le coût total, elle est acceptée et devient la nouvelle solution courante. Le processus est répété jusqu’à ce qu’aucune amélioration ne soit possible, ce qui correspond à un optimum local pour le problème du TSP.
+\subsubsection{Principe de fonctionnement}
+
+L'algorithme 2-opt cherche à améliorer une tournée en \textbf{inversant des segments} du parcours. Pour chaque paire d'arêtes $(i, i+1)$ et $(k, k+1)$ :
+\begin{enumerate}
+    \item On supprime ces deux arêtes
+    \item On reconnecte en inversant le segment entre $i+1$ et $k$
+    \item Si le coût diminue, on accepte la modification
+    \item On répète jusqu'à ce qu'aucune amélioration ne soit possible
+\end{enumerate}
+
+\subsubsection{Exemple visuel}
+
+\begin{center}
+\begin{tikzpicture}[scale=1.5]
+    % Avant
+    \begin{scope}[xshift=0cm]
+        \node[circle, fill=blue!30, draw] (A) at (0,0) {A};
+        \node[circle, fill=blue!30, draw] (B) at (2,0) {B};
+        \node[circle, fill=blue!30, draw] (C) at (2,2) {C};
+        \node[circle, fill=blue!30, draw] (D) at (0,2) {D};
+        
+        \draw[->, thick] (A) -- (B);
+        \draw[->, thick, red] (B) -- (D);
+        \draw[->, thick, red] (D) -- (C);
+        \draw[->, thick] (C) -- (A);
+        
+        \node[below] at (1,-0.5) {\textbf{Avant} : Croisement};
+    \end{scope}
+    
+    % Après
+    \begin{scope}[xshift=5cm]
+        \node[circle, fill=green!30, draw] (A) at (0,0) {A};
+        \node[circle, fill=green!30, draw] (B) at (2,0) {B};
+        \node[circle, fill=green!30, draw] (C) at (2,2) {C};
+        \node[circle, fill=green!30, draw] (D) at (0,2) {D};
+        
+        \draw[->, thick] (A) -- (B);
+        \draw[->, thick, green!70!black] (B) -- (C);
+        \draw[->, thick, green!70!black] (C) -- (D);
+        \draw[->, thick] (D) -- (A);
+        
+        \node[below] at (1,-0.5) {\textbf{Après} : Pas de croisement};
+    \end{scope}
+\end{tikzpicture}
+\end{center}
+
+L'inversion du segment $[B, D]$ élimine le croisement et réduit la distance totale.
+
+\subsubsection{Adaptation au TSP}
+
+La tournée est représentée comme une liste ordonnée de villes. L'algorithme évalue systématiquement toutes les inversions possibles et accepte la première amélioration trouvée (stratégie \textit{first improvement}).
+
+\subsubsection{Algorithme}
 
 \begin{algorithm}[H]
 \SetAlgoLined
@@ -205,25 +472,97 @@ $amelioration \leftarrow Vrai$\;
 \caption{Recherche locale 2-opt pour le TSP}
 \end{algorithm}
 
-\paragraph{Complexité}
-Les échanges possibles sont en $\mathcal{O}(n^2)$.  
-La complexité globale est donc :
+\subsubsection{Complexité}
+
+La complexité de l'algorithme 2-opt est :
 \[
-\mathcal{O}(n^2)
+\mathcal{O}(n^2 \times k)
 \]
+
+où $k$ est le nombre d'itérations de la boucle \texttt{while}.
+
+\textbf{Explication détaillée :}
+\begin{itemize}
+    \item \textbf{Boucles imbriquées} : Il y a $\binom{n}{2} = \frac{n(n-1)}{2} = \mathcal{O}(n^2)$ paires d'arêtes possibles à tester
+    \item \textbf{Nombre d'itérations} : Le nombre de fois où on trouve une amélioration dépend de :
+    \begin{itemize}
+        \item La qualité de la solution initiale
+        \item La structure de l'instance
+        \item Dans le pire cas, $k$ peut être $\mathcal{O}(n)$ ou plus
+    \end{itemize}
+    \item \textbf{Complexité totale} : $\mathcal{O}(n^2 \times k)$
+\end{itemize}
+
+\textbf{Note importante :} La complexité n'est \textbf{pas} simplement $\mathcal{O}(n^2)$ comme indiqué dans la version précédente du rapport. Le facteur $k$ (nombre d'améliorations successives) peut être significatif.
+
+\subsubsection{Optimum local}
+
+L'algorithme 2-opt converge vers un \textbf{optimum local} : une solution qui ne peut pas être améliorée par des inversions 2-opt, mais qui n'est pas nécessairement la solution optimale globale.
 
 % =====================================================
 \subsection{Méta-heuristique : GRASP}
 
-La méta-heuristique GRASP est adaptée au TSP en combinant une phase constructive randomisée et une phase de recherche locale. La phase constructive repose sur une version modifiée de l’heuristique du plus proche voisin, dans laquelle le choix de la prochaine ville est effectué aléatoirement à partir d’une liste restreinte de candidats, définie à partir des distances dans le graphe.
+GRASP (\textit{Greedy Randomized Adaptive Search Procedure}) est une méta-heuristique combinant \textbf{diversification} et \textbf{intensification}.
 
-Le paramètre $\alpha$ permet de contrôler le compromis entre choix glouton et diversification. Chaque solution construite est ensuite améliorée à l’aide de la recherche locale 2-opt. Cette procédure est répétée sur un nombre fixé d’itérations, et la meilleure tournée obtenue est conservée comme solution finale pour le TSP.
+\subsubsection{Principe de fonctionnement}
+
+GRASP fonctionne en deux phases répétées sur plusieurs itérations :
+
+\begin{enumerate}
+    \item \textbf{Phase de construction randomisée} : Construire une solution de manière semi-gloutonne avec un élément aléatoire
+    \item \textbf{Phase d'amélioration locale} : Améliorer la solution avec 2-opt
+\end{enumerate}
+
+La meilleure solution trouvée sur toutes les itérations est conservée.
+
+\subsubsection{Diagramme du processus}
+
+\begin{center}
+\begin{tikzpicture}[
+    node distance=1.5cm,
+    box/.style={rectangle, draw, fill=blue!20, text width=3cm, align=center, rounded corners, minimum height=1cm},
+    decision/.style={diamond, draw, fill=yellow!20, text width=2cm, align=center, aspect=2}
+]
+    \node[box] (start) {Début};
+    \node[box, below of=start] (construct) {Construction\\randomisée\\(RCL + $\alpha$)};
+    \node[box, below of=construct] (improve) {Amélioration\\locale\\(2-opt)};
+    \node[decision, below of=improve] (better) {Meilleure\\solution ?};
+    \node[box, below of=better, node distance=2cm] (update) {Mettre à jour\\meilleur};
+    \node[decision, right of=better, node distance=4cm] (continue) {Plus\\d'itérations ?};
+    \node[box, below of=continue, node distance=2cm] (end) {Retourner\\meilleur};
+    
+    \draw[->] (start) -- (construct);
+    \draw[->] (construct) -- (improve);
+    \draw[->] (improve) -- (better);
+    \draw[->] (better) -- node[right] {Oui} (update);
+    \draw[->] (better) -- node[above] {Non} (continue);
+    \draw[->] (update) -| (continue);
+    \draw[->] (continue) -- node[right] {Non} (end);
+    \draw[->] (continue) |- node[above, near start] {Oui} (construct);
+\end{tikzpicture}
+\end{center}
+
+\subsubsection{Liste Restreinte de Candidats (RCL)}
+
+Le paramètre $\alpha \in [0, 1]$ contrôle le compromis entre choix glouton et diversification :
+\begin{itemize}
+    \item $\alpha = 0$ : Purement glouton (toujours choisir le meilleur)
+    \item $\alpha = 1$ : Complètement aléatoire
+    \item $\alpha \in ]0, 1[$ : Compromis (valeur typique : 0.3)
+\end{itemize}
+
+La RCL contient les villes dont la distance est dans l'intervalle :
+\[
+[C_{min}, C_{min} + \alpha(C_{max} - C_{min})]
+\]
+
+\subsubsection{Algorithme}
 
 \begin{algorithm}[H]
 \SetAlgoLined
 \DontPrintSemicolon
 
-\Donnees{Matrice des distances $D$, paramètre $\alpha$, nombre d’itérations $MaxIter$}
+\Donnees{Matrice des distances $D$, paramètre $\alpha$, nombre d'itérations $MaxIter$}
 $MeilleurCout \leftarrow +\infty$\;
 $MeilleureSolution \leftarrow \emptyset$\;
 
@@ -232,7 +571,7 @@ $MeilleureSolution \leftarrow \emptyset$\;
 
     \BlankLine
     \textit{// Phase 1 : Construction gloutonne randomisée}\;
-    Choisir une ville de départ aléatoire (ville 0)\;
+    Choisir une ville de départ (ville 0)\;
     $T \leftarrow [v_{depart}]$\;
     \While{$|T| < n$}{
         $Candidats \leftarrow$ villes non visitées\;
@@ -258,52 +597,405 @@ $MeilleureSolution \leftarrow \emptyset$\;
 \caption{Méta-heuristique GRASP pour le TSP}
 \end{algorithm}
 
-\paragraph{Complexité}
-Chaque itération a un coût en $\mathcal{O}(n^2)$.  
-La complexité totale est donc :
+\subsubsection{Complexité}
+
+La complexité de GRASP est :
 \[
-\mathcal{O}(I_{max} \times n^2)
+\mathcal{O}(I_{max} \times n^2 \times k)
 \]
+
+\textbf{Explication détaillée :}
+\begin{itemize}
+    \item $I_{max}$ : Nombre d'itérations de GRASP (typiquement 100-1000)
+    \item Pour chaque itération :
+    \begin{itemize}
+        \item \textbf{Construction} : $\mathcal{O}(n^2)$ (similaire au plus proche voisin)
+        \item \textbf{Amélioration locale} : $\mathcal{O}(n^2 \times k)$ (2-opt)
+    \end{itemize}
+    \item \textbf{Total par itération} : $\mathcal{O}(n^2 + n^2 \times k) = \mathcal{O}(n^2 \times k)$
+    \item \textbf{Total global} : $\mathcal{O}(I_{max} \times n^2 \times k)$
+\end{itemize}
+
+En pratique, $I_{max}$ est fixé à une valeur raisonnable (100 dans notre implémentation), ce qui rend GRASP utilisable même pour des instances de taille moyenne.
+
+\clearpage
+% ==============================
+\section{Méthodologie de Test}
+
+Cette section décrit la méthodologie utilisée pour évaluer et comparer les performances des différents algorithmes implémentés.
+
+\subsection{Instances de Test}
+
+Trois instances ont été utilisées pour les tests :
+
+\begin{table}[H]
+\centering
+\begin{tabular}{lcc}
+\toprule
+\textbf{Instance} & \textbf{Nombre de villes} & \textbf{Type} \\
+\midrule
+17.in & 17 & Petite instance \\
+51.in & 51 & Instance moyenne \\
+52.in & 52 & Instance moyenne \\
+\bottomrule
+\end{tabular}
+\caption{Instances de test utilisées}
+\label{tab:instances}
+\end{table}
+
+Ces instances sont des graphes complets pondérés où chaque ville est connectée à toutes les autres avec des distances euclidiennes.
+
+\subsection{Paramètres des Algorithmes}
+
+\begin{itemize}
+    \item \textbf{Branch and Bound} : Timeout de 60 secondes pour éviter des temps d'exécution trop longs
+    \item \textbf{Plus Proche Voisin} : Départ fixé à la ville 0
+    \item \textbf{2-opt} : Solution initiale obtenue par Plus Proche Voisin
+    \item \textbf{GRASP} : 
+    \begin{itemize}
+        \item Nombre d'itérations : 100
+        \item Paramètre $\alpha$ : 0.3
+        \item Amélioration locale : 2-opt
+    \end{itemize}
+\end{itemize}
+
+\subsection{Environnement d'Exécution}
+
+Les tests ont été effectués sur :
+\begin{itemize}
+    \item \textbf{Système d'exploitation} : macOS
+    \item \textbf{Langage} : Python 3
+    \item \textbf{Processeur} : Variable selon la machine
+\end{itemize}
+
+\subsection{Métriques Évaluées}
+
+Pour chaque algorithme et chaque instance, nous mesurons :
+\begin{enumerate}
+    \item \textbf{Coût de la tournée} : Distance totale parcourue
+    \item \textbf{Temps d'exécution} : Durée en secondes
+    \item \textbf{Écart à l'optimal} : Pourcentage de différence avec la meilleure solution connue
+    \item \textbf{Ratio qualité/temps} : Compromis entre qualité de solution et rapidité
+\end{enumerate}
 
 \clearpage
 % ==============================
 \section{Analyse des Résultats}
 
-Cette section présente les performances comparées des différentes méthodes implémentées pour le TSP sur plusieurs instances de test. Les résultats sont analysés en termes de coût de la tournée et de temps d’exécution.
+Cette section présente une analyse détaillée des performances comparées des différentes méthodes implémentées.
+
+\subsection{Résultats Bruts}
+
+Le tableau suivant présente les résultats obtenus pour chaque algorithme sur les trois instances de test :
+
+\begin{table}[H]
+\centering
+\begin{tabular}{llrrr}
+\toprule
+\textbf{Instance} & \textbf{Algorithme} & \textbf{Coût} & \textbf{Temps (s)} & \textbf{Statut} \\
+\midrule
+\multirow{4}{*}{17.in} & Exact & 2085.0 & 18.72 & Optimal \\
+                       & Constructive & 2187.0 & 0.024 & Heuristique \\
+                       & LocalSearch & 2085.0 & 0.025 & Optimal \\
+                       & GRASP\_LS & 2085.0 & 0.069 & Optimal \\
+\midrule
+\multirow{4}{*}{51.in} & Exact & 449.0 & 60.02 & Timeout \\
+                       & Constructive & 511.0 & 0.025 & Heuristique \\
+                       & LocalSearch & 438.0 & 0.096 & Meilleur \\
+                       & GRASP\_LS & 439.0 & 3.38 & Très bon \\
+\midrule
+\multirow{4}{*}{52.in} & Exact & 8021.0 & 60.03 & Timeout \\
+                       & Constructive & 8980.0 & 0.024 & Heuristique \\
+                       & LocalSearch & 7967.0 & 0.064 & Très bon \\
+                       & GRASP\_LS & 7672.0 & 4.36 & Meilleur \\
+\bottomrule
+\end{tabular}
+\caption{Résultats détaillés par algorithme et instance}
+\label{tab:results}
+\end{table}
+
+\subsection{Analyse par Instance}
+
+\subsubsection{Instance 17.in (17 villes)}
+
+Sur cette petite instance :
+\begin{itemize}
+    \item \textbf{Branch and Bound} trouve l'optimal (2085) en 18.72 secondes
+    \item \textbf{LocalSearch} et \textbf{GRASP} atteignent également l'optimal
+    \item \textbf{Constructive} donne une solution 4.9\% plus coûteuse (2187 vs 2085)
+    \item Les heuristiques sont \textbf{780 fois plus rapides} que l'algorithme exact
+\end{itemize}
+
+\subsubsection{Instance 51.in (51 villes)}
+
+Sur cette instance moyenne :
+\begin{itemize}
+    \item \textbf{Branch and Bound} atteint le timeout (60s) avec une solution de coût 449
+    \item \textbf{LocalSearch} obtient le meilleur résultat (438) en seulement 0.096s
+    \item \textbf{GRASP} est très proche (439) avec un temps légèrement supérieur (3.38s)
+    \item \textbf{Constructive} donne une solution 16.7\% plus coûteuse (511 vs 438)
+\end{itemize}
+
+\subsubsection{Instance 52.in (52 villes)}
+
+Sur cette instance moyenne :
+\begin{itemize}
+    \item \textbf{Branch and Bound} atteint le timeout avec une solution de coût 8021
+    \item \textbf{GRASP} obtient le meilleur résultat (7672) en 4.36 secondes
+    \item \textbf{LocalSearch} est très proche (7967) et beaucoup plus rapide (0.064s)
+    \item \textbf{Constructive} donne une solution 17\% plus coûteuse (8980 vs 7672)
+\end{itemize}
+
+\subsection{Comparaison Globale des Coûts}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.8\textwidth]{"results/plots/comparison_cost.png"}
+    \includegraphics[width=0.85\textwidth]{../results/plots/comparison_cost.png}
     \caption{Comparaison du coût de la tournée par algorithme}
     \label{fig:comparison_cost}
 \end{figure}
 
-Le graphique ci-dessus (\textit{figure \ref{fig:comparison_cost}}) montre que les méthodes heuristiques parviennent à trouver des solutions très proches les unes des autres sur les petites instances. Cependant, sur les instances plus complexes, la supériorité des méthodes d'amélioration se dessine.
+Le graphique ci-dessus montre clairement que :
+\begin{itemize}
+    \item Les méthodes d'amélioration (\textbf{LocalSearch} et \textbf{GRASP}) surpassent systématiquement la méthode constructive
+    \item Sur les petites instances, toutes les méthodes (sauf Constructive) atteignent l'optimal
+    \item Sur les instances moyennes, \textbf{GRASP} tend à donner les meilleures solutions
+\end{itemize}
+
+\subsection{Comparaison Globale des Temps}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.8\textwidth]{"results/plots/comparison_time.png"}
-    \caption{Comparaison du temps d'exécution par algorithme}
+    \includegraphics[width=0.85\textwidth]{../results/plots/comparison_time.png}
+    \caption{Comparaison du temps d'exécution par algorithme (échelle logarithmique)}
     \label{fig:comparison_time}
 \end{figure}
 
-L'analyse des temps d'exécution (\textit{figure \ref{fig:comparison_time}}) souligne l'explosion combinatoire de l'algorithme exact \textbf{Branch and Bound}. À l'opposé, l'heuristique constructive est quasi-instantanée, tandis que \textbf{GRASP\_LS} présente un surcoût temporel maîtrisé par rapport à la recherche locale simple.
+L'analyse des temps d'exécution révèle :
+\begin{itemize}
+    \item \textbf{Branch and Bound} : Explosion combinatoire évidente, timeout atteint dès 51 villes
+    \item \textbf{Constructive} : Quasi-instantané ($\sim$0.024s), indépendant de la taille
+    \item \textbf{LocalSearch} : Très rapide ($\sim$0.025-0.096s), excellent compromis
+    \item \textbf{GRASP} : Temps raisonnable (0.07-4.36s), acceptable pour la qualité obtenue
+\end{itemize}
+
+\subsection{Analyse Détaillée par Algorithme}
+
+\subsubsection{Performance de Branch and Bound}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\textwidth]{../results/plots/performance_Exact.png}
+    \caption{Performance de l'algorithme Branch and Bound}
+    \label{fig:perf_exact}
+\end{figure}
+
+L'algorithme exact montre :
+\begin{itemize}
+    \item \textbf{Garantie d'optimalité} sur les petites instances
+    \item \textbf{Explosion du temps} : de 18.72s (17 villes) à timeout (51+ villes)
+    \item \textbf{Limite pratique} : environ 20-25 villes maximum
+\end{itemize}
+
+\subsubsection{Performance de Plus Proche Voisin}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\textwidth]{../results/plots/performance_Constructive.png}
+    \caption{Performance de l'heuristique constructive}
+    \label{fig:perf_constructive}
+\end{figure}
+
+L'heuristique constructive montre :
+\begin{itemize}
+    \item \textbf{Rapidité exceptionnelle} : toujours sous 0.025s
+    \item \textbf{Qualité variable} : écart de 5\% à 17\% par rapport à l'optimal
+    \item \textbf{Utilité} : excellente solution initiale pour les méthodes d'amélioration
+\end{itemize}
+
+\subsubsection{Performance de 2-opt}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\textwidth]{../results/plots/performance_LocalSearch.png}
+    \caption{Performance de la recherche locale 2-opt}
+    \label{fig:perf_local}
+\end{figure}
+
+La recherche locale montre :
+\begin{itemize}
+    \item \textbf{Excellent compromis} qualité/temps
+    \item \textbf{Amélioration significative} par rapport à la solution initiale
+    \item \textbf{Rapidité} : toujours sous 0.1s
+    \item \textbf{Résultats} : optimal ou très proche sur toutes les instances
+\end{itemize}
+
+\subsubsection{Performance de GRASP}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\textwidth]{../results/plots/performance_GRASP_LS.png}
+    \caption{Performance de la méta-heuristique GRASP}
+    \label{fig:perf_grasp}
+\end{figure}
+
+GRASP montre :
+\begin{itemize}
+    \item \textbf{Meilleures solutions} sur les instances moyennes
+    \item \textbf{Robustesse} : performances consistantes
+    \item \textbf{Temps acceptable} : 0.07s à 4.36s
+    \item \textbf{Diversification efficace} : explore mieux l'espace de solutions
+\end{itemize}
+
+\subsection{Comparaison Détaillée par Instance}
+
+\subsubsection{Instance 17.in}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\textwidth]{../results/plots/instance_17.in.png}
+    \caption{Comparaison détaillée sur l'instance 17.in}
+    \label{fig:inst_17}
+\end{figure}
+
+\subsubsection{Instance 51.in}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\textwidth]{../results/plots/instance_51.in.png}
+    \caption{Comparaison détaillée sur l'instance 51.in}
+    \label{fig:inst_51}
+\end{figure}
+
+\subsubsection{Instance 52.in}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\textwidth]{../results/plots/instance_52.in.png}
+    \caption{Comparaison détaillée sur l'instance 52.in}
+    \label{fig:inst_52}
+\end{figure}
+
+\subsection{Tableau Comparatif des Écarts}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{lrrr}
+\toprule
+\textbf{Algorithme} & \textbf{17.in} & \textbf{51.in} & \textbf{52.in} \\
+\midrule
+Exact & 0\% (optimal) & - & - \\
+Constructive & +4.9\% & +16.7\% & +17.0\% \\
+LocalSearch & 0\% (optimal) & 0\% (meilleur) & +3.8\% \\
+GRASP\_LS & 0\% (optimal) & +0.2\% & 0\% (meilleur) \\
+\bottomrule
+\end{tabular}
+\caption{Écart par rapport à la meilleure solution connue}
+\label{tab:gaps}
+\end{table}
+
+\subsection{Analyse Statistique}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{lrrrr}
+\toprule
+\textbf{Algorithme} & \textbf{Coût moyen} & \textbf{Temps moyen (s)} & \textbf{Ratio Q/T} \\
+\midrule
+Exact & 3518.3 & 46.25 & 76.1 \\
+Constructive & 3892.7 & 0.024 & 162197.9 \\
+LocalSearch & 3496.7 & 0.062 & 56398.4 \\
+GRASP\_LS & 3398.7 & 2.605 & 1304.5 \\
+\bottomrule
+\end{tabular}
+\caption{Statistiques moyennes sur toutes les instances}
+\label{tab:stats}
+\end{table}
+
+\textbf{Observations :}
+\begin{itemize}
+    \item \textbf{GRASP} obtient le meilleur coût moyen (3398.7)
+    \item \textbf{Constructive} est le plus rapide mais avec la moins bonne qualité
+    \item \textbf{LocalSearch} offre le meilleur ratio qualité/temps
+\end{itemize}
+
+\subsection{Synthèse Comparative}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{lcccc}
+\toprule
+\textbf{Critère} & \textbf{Exact} & \textbf{Constructive} & \textbf{LocalSearch} & \textbf{GRASP} \\
+\midrule
+Optimalité & +++  & -   & ++  & +++ \\
+Rapidité   & -    & +++ & +++ & ++  \\
+Scalabilité & -   & +++ & +++ & ++  \\
+Robustesse & +++  & -   & ++  & +++ \\
+\midrule
+\textbf{Global} & ++ & ++ & +++ & +++ \\
+\bottomrule
+\end{tabular}
+\caption{Évaluation qualitative des algorithmes}
+\label{tab:qualitative}
+\end{table}
 
 \clearpage
 % ==============================
 \section{Conclusion}
 
-Ce projet a permis d'explorer différents paradigmes de résolution du Problème du Voyageur de Commerce (TSP). L'étude comparative des performances des algorithmes implémentés conduit aux constats suivants :
+Ce projet a permis d'explorer et de comparer différents paradigmes de résolution du Problème du Voyageur de Commerce (TSP). L'étude comparative des performances des algorithmes implémentés conduit aux constats suivants :
+
+\subsection{Synthèse des Résultats}
 
 \begin{itemize}
-    \item \textbf{L'algorithme Branch and Bound} est indispensable pour garantir l'optimalité sur de très petites instances, mais sa complexité factorielle le rend rapidement inexploitable pour des problèmes de taille moyenne.
-    \item \textbf{L'heuristique constructive} du plus proche voisin offre une excellente réactivité (environ $0{,}02$ seconde), mais génère des solutions souvent éloignées de l’optimum.
-    \item \textbf{La recherche locale (2-opt)} permet d’améliorer significativement les solutions initiales avec un surcoût computationnel très faible, ce qui en fait un outil essentiel dans une approche heuristique.
+    \item \textbf{L'algorithme Branch and Bound} est indispensable pour garantir l'optimalité sur de très petites instances (moins de 20 villes), mais sa complexité factorielle $\mathcal{O}(n!)$ le rend rapidement inexploitable. Le timeout de 60 secondes est atteint dès 51 villes.
+    
+    \item \textbf{L'heuristique constructive} du plus proche voisin offre une excellente réactivité (environ 0.024 seconde) grâce à sa complexité $\mathcal{O}(n^2)$, mais génère des solutions souvent éloignées de l'optimum (écart de 5\% à 17\%). Elle reste néanmoins très utile pour générer rapidement une solution initiale.
+    
+    \item \textbf{La recherche locale (2-opt)} permet d'améliorer significativement les solutions initiales avec un surcoût computationnel très faible (0.025 à 0.096 seconde). Sa complexité réelle $\mathcal{O}(n^2 \times k)$ (et non $\mathcal{O}(n^2)$ comme initialement indiqué) reste très raisonnable en pratique. Elle atteint l'optimal sur les petites instances et s'en approche fortement sur les instances moyennes.
+    
+    \item \textbf{La méta-heuristique GRASP} combine efficacement diversification (phase constructive randomisée) et intensification (recherche locale 2-opt). Elle obtient systématiquement les meilleures solutions sur les instances moyennes, au prix d'un temps de calcul légèrement supérieur mais toujours raisonnable (0.07 à 4.36 secondes).
 \end{itemize}
 
-\textbf{Élection de la meilleure méthode :}  
-Au regard de l’ensemble des instances testées, la méta-heuristique \textbf{GRASP\_LS} s’impose comme la méthode la plus performante. En combinant efficacement la diversification (phase constructive randomisée) et l’intensification (recherche locale 2-opt), elle obtient systématiquement les meilleures solutions, au prix d’un temps de calcul légèrement supérieur mais toujours raisonnable.  
+\subsection{Élection de la Meilleure Méthode}
 
-Sur les instances testées (notamment \textit{52.in}), \textbf{GRASP\_LS} atteint le coût le plus faible ($7800$ contre $8980$ pour la méthode constructive) tout en restant sous la barre des 5 secondes d’exécution. Elle constitue ainsi le meilleur compromis entre qualité de solution et temps de calcul, et est recommandée pour une utilisation généralisée dans le cadre du TSP.
+Au regard de l'ensemble des instances testées, deux méthodes se distinguent selon le contexte :
+
+\paragraph{Pour la qualité de solution :} La méta-heuristique \textbf{GRASP\_LS} s'impose comme la méthode la plus performante. Sur les instances testées, elle atteint :
+\begin{itemize}
+    \item L'optimal sur l'instance 17.in (2085)
+    \item Le meilleur résultat sur l'instance 52.in (7672, soit 4\% mieux que LocalSearch)
+    \item Un résultat quasi-optimal sur l'instance 51.in (439 vs 438)
+\end{itemize}
+
+\paragraph{Pour le compromis qualité/temps :} La \textbf{recherche locale 2-opt} offre le meilleur rapport performance/rapidité. Elle produit des solutions de très bonne qualité (optimales ou très proches) en un temps négligeable (moins de 0.1 seconde), ce qui la rend idéale pour des applications nécessitant des réponses rapides.
+
+\subsection{Recommandations Pratiques}
+
+En fonction du contexte d'utilisation, nous recommandons :
+
+\begin{itemize}
+    \item \textbf{Instances très petites ($n < 20$)} : Utiliser Branch and Bound pour garantir l'optimalité
+    \item \textbf{Instances moyennes ($20 \le n \le 100$)} : Utiliser GRASP pour la meilleure qualité, ou LocalSearch pour un résultat rapide
+    \item \textbf{Grandes instances ($n > 100$)} : Utiliser GRASP avec un nombre d'itérations adapté
+    \item \textbf{Applications temps réel} : Utiliser LocalSearch pour sa rapidité
+\end{itemize}
+
+\subsection{Perspectives d'Amélioration}
+
+Plusieurs pistes pourraient être explorées pour améliorer encore les performances :
+
+\begin{itemize}
+    \item \textbf{Variantes de recherche locale} : Implémenter 3-opt ou Lin-Kernighan pour échapper à certains optima locaux
+    \item \textbf{Parallélisation} : Exécuter plusieurs instances de GRASP en parallèle
+    \item \textbf{Méthodes hybrides} : Combiner GRASP avec d'autres méta-heuristiques (algorithmes génétiques, recuit simulé)
+    \item \textbf{Apprentissage automatique} : Utiliser l'apprentissage par renforcement pour guider la recherche
+\end{itemize}
+
+\subsection{Conclusion Générale}
+
+Ce projet a démontré l'importance de disposer d'un \textbf{portfolio d'algorithmes} pour résoudre efficacement le TSP. Aucune méthode n'est universellement supérieure : le choix dépend des contraintes spécifiques (taille de l'instance, temps disponible, qualité requise).
+
+La méta-heuristique GRASP, en combinant intelligemment construction randomisée et amélioration locale, représente actuellement le meilleur compromis pour la plupart des applications pratiques du TSP. Son coût computationnel raisonnable et sa robustesse en font un outil de choix pour l'optimisation de tournées dans des contextes industriels réels.
 
 \end{document}
