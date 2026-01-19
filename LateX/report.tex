@@ -31,13 +31,6 @@
 % ==============================
 % MOTS-CLÉS ALGORITHMES
 % ==============================
-\SetKw{KwSi}{Si}
-\SetKw{KwAlors}{Alors}
-\SetKw{KwSinon}{Sinon}
-\SetKw{KwPour}{Pour}
-\SetKw{KwPourChaque}{Pour chaque}
-\SetKw{KwTantQue}{Tant que}
-\SetKw{KwRetourner}{Retourner}
 \SetKwData{Donnees}{Données}
 
 \begin{document}
@@ -101,7 +94,7 @@ $CoutTotal \leftarrow 0$\;
 
 \BlankLine
 \textbf{Construction de la tournée :}\;
-\TantQue{$|Tournee| < n$}{
+\While{$|Tournee| < n$}{
     \Indp
     \tcp{Sélectionner la ville non visitée la plus proche}
     $v_{suivante} \leftarrow$ argmin$_{v \notin VillesVisitees} D[v_{actuelle}, v]$\;
@@ -150,28 +143,21 @@ $MeilleureTournee \leftarrow \emptyset$\;
 
 \BlankLine
 \textbf{Procédure Explorer($C_p$, $K_p$, $V_p$)}\;
-\Indp
-    \KwSi{$K_p \ge MeilleurCout$}{
-        \KwRetourner \tcp*[r]{Élagage}
+\tcp{$C_p$ : chemin partiel, $K_p$ : coût partiel, $V_p$ : villes visitées}
+    \If{$K_p \ge MeilleurCout$}{
+        \KwRet \tcp*[r]{Élagage}
     }
-
-    \BlankLine
-    \KwSi{$|C_p| = n$}{
-        $K_{final} \leftarrow K_p + D[dernier(C_p), premier(C_p)]$\;
-        \KwSi{$K_{final} < MeilleurCout$}{
+    \If{$|C_p| = n$}{
+        $K_{final} \leftarrow K_p + D[dernier(C_p), premier(C_p)]$
+        \If{$K_{final} < MeilleurCout$}{
             $MeilleurCout \leftarrow K_{final}$\;
             $MeilleureTournee \leftarrow C_p$\;
         }
-        \KwRetourner\;
+        \KwRet\;
     }
-
-    \BlankLine
-    \PourChaque{ville $v \notin V_p$}{
+    \ForEach{ville $v \notin V_p$}{
         Explorer($C_p \cup \{v\}$, $K_p + D[dernier(C_p), v]$, $V_p \cup \{v\}$)\;
     }
-\Indm
-
-\BlankLine
 Explorer([0], 0, \{0\})\;
 \KwRetourner $MeilleureTournee$, $MeilleurCout$\;
 
@@ -200,12 +186,12 @@ L’adaptation repose sur l’évaluation systématique de modifications locales
 $amelioration \leftarrow Vrai$\;
 
 \BlankLine
-\TantQue{$amelioration$}{
+\While{$amelioration$}{
     $amelioration \leftarrow Faux$\;
-    \Pour{$i = 1$ \KwTo $n-2$}{
-        \Pour{$k = i+1$ \KwTo $n-1$}{
+    \For{$i = 1$ \KwTo $n-2$}{
+        \For{$k = i+1$ \KwTo $n-1$}{
             $T' \leftarrow$ inverser le segment $[i,k]$ de $T$\;
-            \KwSi{$Cout(T') < Cout(T)$}{
+            \If{$Cout(T') < Cout(T)$}{
                 $T \leftarrow T'$\;
                 $amelioration \leftarrow Vrai$\;
                 \textbf{Sortir des boucles}\;
@@ -242,13 +228,13 @@ $MeilleurCout \leftarrow +\infty$\;
 $MeilleureSolution \leftarrow \emptyset$\;
 
 \BlankLine
-\Pour{$iter = 1$ \KwTo $MaxIter$}{
+\For{$iter = 1$ \KwTo $MaxIter$}{
 
     \BlankLine
     \textit{// Phase 1 : Construction gloutonne randomisée}\;
     Choisir une ville de départ aléatoire (ville 0)\;
     $T \leftarrow [v_{depart}]$\;
-    \TantQue{$|T| < n$}{
+    \While{$|T| < n$}{
         $Candidats \leftarrow$ villes non visitées\;
         $C_{min}, C_{max} \leftarrow$ coûts min et max depuis la ville courante\;
         $LRC \leftarrow \{v \in Candidats \mid D \le C_{min} + \alpha(C_{max} - C_{min})\}$\;
@@ -261,7 +247,7 @@ $MeilleureSolution \leftarrow \emptyset$\;
     $T_{opt} \leftarrow$ RechercheLocale2Opt($T$)\;
 
     \BlankLine
-    \KwSi{$Cout(T_{opt}) < MeilleurCout$}{
+    \If{$Cout(T_{opt}) < MeilleurCout$}{
         $MeilleurCout \leftarrow Cout(T_{opt})$\;
         $MeilleureSolution \leftarrow T_{opt}$\;
     }
