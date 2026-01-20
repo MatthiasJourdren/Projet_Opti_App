@@ -1,0 +1,64 @@
+\babel@toc {french}{}\relax 
+\contentsline {section}{\numberline {1}Introduction}{4}{section.1}%
+\contentsline {section}{\numberline {2}Applications du TSP}{4}{section.2}%
+\contentsline {subsection}{\numberline {2.1}Fabrication de Circuits Imprimés (PCB)}{4}{subsection.2.1}%
+\contentsline {subsection}{\numberline {2.2}Séquençage ADN}{4}{subsection.2.2}%
+\contentsline {subsection}{\numberline {2.3}Astronomie}{5}{subsection.2.3}%
+\contentsline {subsection}{\numberline {2.4}Autres Applications}{5}{subsection.2.4}%
+\contentsline {section}{\numberline {3}Méthodes Implémentées}{6}{section.3}%
+\contentsline {subsection}{\numberline {3.1}Algorithme exact : Branch and Bound}{6}{subsection.3.1}%
+\contentsline {subsubsection}{\numberline {3.1.1}Principe de fonctionnement}{6}{subsubsection.3.1.1}%
+\contentsline {subsubsection}{\numberline {3.1.2}Exemple visuel}{6}{subsubsection.3.1.2}%
+\contentsline {subsubsection}{\numberline {3.1.3}Algorithme}{7}{subsubsection.3.1.3}%
+\contentsline {subsubsection}{\numberline {3.1.4}Complexité}{8}{subsubsection.3.1.4}%
+\contentsline {subsection}{\numberline {3.2}Heuristique constructive : Plus proche voisin}{9}{subsection.3.2}%
+\contentsline {subsubsection}{\numberline {3.2.1}Principe de fonctionnement}{9}{subsubsection.3.2.1}%
+\contentsline {subsubsection}{\numberline {3.2.2}Exemple visuel}{9}{subsubsection.3.2.2}%
+\contentsline {subsubsection}{\numberline {3.2.3}Adaptation au TSP}{9}{subsubsection.3.2.3}%
+\contentsline {subsubsection}{\numberline {3.2.4}Algorithme}{10}{subsubsection.3.2.4}%
+\contentsline {subsubsection}{\numberline {3.2.5}Complexité}{10}{subsubsection.3.2.5}%
+\contentsline {subsubsection}{\numberline {3.2.6}Limites}{11}{subsubsection.3.2.6}%
+\contentsline {subsection}{\numberline {3.3}Heuristique de recherche locale : 2-opt}{11}{subsection.3.3}%
+\contentsline {subsubsection}{\numberline {3.3.1}Principe de fonctionnement}{11}{subsubsection.3.3.1}%
+\contentsline {subsubsection}{\numberline {3.3.2}Exemple visuel}{11}{subsubsection.3.3.2}%
+\contentsline {subsubsection}{\numberline {3.3.3}Adaptation au TSP}{11}{subsubsection.3.3.3}%
+\contentsline {subsubsection}{\numberline {3.3.4}Algorithme}{12}{subsubsection.3.3.4}%
+\contentsline {subsubsection}{\numberline {3.3.5}Complexité}{12}{subsubsection.3.3.5}%
+\contentsline {subsubsection}{\numberline {3.3.6}Optimum local}{12}{subsubsection.3.3.6}%
+\contentsline {subsection}{\numberline {3.4}Méta-heuristique : GRASP}{13}{subsection.3.4}%
+\contentsline {subsubsection}{\numberline {3.4.1}Principe de fonctionnement}{13}{subsubsection.3.4.1}%
+\contentsline {subsubsection}{\numberline {3.4.2}Diagramme du processus}{13}{subsubsection.3.4.2}%
+\contentsline {subsubsection}{\numberline {3.4.3}Liste Restreinte de Candidats (RCL)}{14}{subsubsection.3.4.3}%
+\contentsline {subsubsection}{\numberline {3.4.4}Algorithme}{14}{subsubsection.3.4.4}%
+\contentsline {subsubsection}{\numberline {3.4.5}Complexité}{15}{subsubsection.3.4.5}%
+\contentsline {section}{\numberline {4}Méthodologie de Test}{16}{section.4}%
+\contentsline {subsection}{\numberline {4.1}Instances de Test}{16}{subsection.4.1}%
+\contentsline {subsection}{\numberline {4.2}Paramètres des Algorithmes}{16}{subsection.4.2}%
+\contentsline {subsection}{\numberline {4.3}Environnement d'Exécution}{16}{subsection.4.3}%
+\contentsline {subsection}{\numberline {4.4}Métriques Évaluées}{16}{subsection.4.4}%
+\contentsline {section}{\numberline {5}Analyse des Résultats}{17}{section.5}%
+\contentsline {subsection}{\numberline {5.1}Résultats Bruts}{17}{subsection.5.1}%
+\contentsline {subsection}{\numberline {5.2}Analyse par Instance}{18}{subsection.5.2}%
+\contentsline {subsubsection}{\numberline {5.2.1}Instance 17.in (17 villes)}{18}{subsubsection.5.2.1}%
+\contentsline {subsubsection}{\numberline {5.2.2}Instance 51.in (51 villes)}{18}{subsubsection.5.2.2}%
+\contentsline {subsubsection}{\numberline {5.2.3}Instance 52.in (52 villes)}{18}{subsubsection.5.2.3}%
+\contentsline {subsection}{\numberline {5.3}Comparaison Globale des Coûts}{19}{subsection.5.3}%
+\contentsline {subsection}{\numberline {5.4}Comparaison Globale des Temps}{20}{subsection.5.4}%
+\contentsline {subsection}{\numberline {5.5}Analyse Détaillée par Algorithme}{21}{subsection.5.5}%
+\contentsline {subsubsection}{\numberline {5.5.1}Performance de Branch and Bound}{21}{subsubsection.5.5.1}%
+\contentsline {subsubsection}{\numberline {5.5.2}Performance de Plus Proche Voisin}{21}{subsubsection.5.5.2}%
+\contentsline {subsubsection}{\numberline {5.5.3}Performance de 2-opt}{22}{subsubsection.5.5.3}%
+\contentsline {subsubsection}{\numberline {5.5.4}Performance de GRASP}{22}{subsubsection.5.5.4}%
+\contentsline {subsection}{\numberline {5.6}Comparaison Détaillée par Instance}{23}{subsection.5.6}%
+\contentsline {subsubsection}{\numberline {5.6.1}Instance 17.in}{23}{subsubsection.5.6.1}%
+\contentsline {subsubsection}{\numberline {5.6.2}Instance 51.in}{23}{subsubsection.5.6.2}%
+\contentsline {subsubsection}{\numberline {5.6.3}Instance 52.in}{24}{subsubsection.5.6.3}%
+\contentsline {subsection}{\numberline {5.7}Tableau Comparatif des Écarts}{24}{subsection.5.7}%
+\contentsline {subsection}{\numberline {5.8}Analyse Statistique}{24}{subsection.5.8}%
+\contentsline {subsection}{\numberline {5.9}Synthèse Comparative}{25}{subsection.5.9}%
+\contentsline {section}{\numberline {6}Conclusion}{26}{section.6}%
+\contentsline {subsection}{\numberline {6.1}Synthèse des Résultats}{26}{subsection.6.1}%
+\contentsline {subsection}{\numberline {6.2}Élection de la Meilleure Méthode}{26}{subsection.6.2}%
+\contentsline {paragraph}{Pour la qualité de solution :}{26}{paragraph*.1}%
+\contentsline {paragraph}{Pour le compromis qualité/temps :}{26}{paragraph*.2}%
+\contentsline {subsection}{\numberline {6.3}Recommandations Pratiques}{27}{subsection.6.3}%

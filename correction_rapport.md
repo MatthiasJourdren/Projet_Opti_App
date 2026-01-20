@@ -1,0 +1,10 @@
+- [x] le graphique dans l'algo GRASP (pas assez grand donc pas très lisible)
+- [x] Mettre le nom du processeur de l'ordi de Matthias dans l'intro des tests
+- [ ] Faire des sauts de page entre les subsections (les méthodes par exemple)
+- [ ] Ajout d'un texte qui résume les analyses sur la partie "Analyse des Résultats" page 18
+- [ ] Ajout d'un texte qui résume les analyses sur la partie "Analyse Détaillée par Algorithme" page 20
+- [ ] Ajout d'un texte qui résume les analyses sur la partie "Comparaison Détaillée par Instance" page 23
+- [x] enlever "(et non O(n2) comme initialement indiqué)" de la conclusion
+- [x] Dans les Recommandations, recommander que LS pour les jeu moyen car très rapide et trouve une super solution
+- [x] Perspective d'amélioration ? semble en trop par rapport à notre niveau
+- [x] Conclusion générale n'apporte rien, ça brasse du vent.

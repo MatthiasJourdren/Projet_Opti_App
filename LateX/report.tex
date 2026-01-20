@@ -102,16 +102,6 @@ Dans ce projet, plusieurs approches ont été implémentées afin de comparer le
 
 Le problème du voyageur de commerce n'est pas qu'un exercice théorique. Il trouve de nombreuses applications pratiques dans divers domaines :
 
-\subsection{Logistique et Transport}
-
-L'application la plus évidente du TSP concerne l'\textbf{optimisation de tournées de livraison}. Les entreprises de transport (UPS, FedEx, DHL) utilisent des variantes du TSP pour :
-\begin{itemize}
-    \item Minimiser la distance parcourue par les camions de livraison
-    \item Réduire la consommation de carburant et les émissions de CO$_2$
-    \item Optimiser les tournées de collecte des déchets
-    \item Planifier les circuits de distribution postale
-\end{itemize}
-
 \subsection{Fabrication de Circuits Imprimés (PCB)}
 
 Dans l'industrie électronique, la fabrication de circuits imprimés nécessite de \textbf{percer des milliers de trous} sur une plaque. Le TSP permet d'optimiser le parcours de la tête de perçage pour :
@@ -139,15 +129,6 @@ Les télescopes automatisés doivent observer plusieurs objets célestes durant 
     \item Tenir compte des contraintes temporelles (visibilité des objets)
 \end{itemize}
 
-\subsection{Industrie Manufacturière}
-
-Dans les usines automatisées, le TSP est utilisé pour optimiser :
-\begin{itemize}
-    \item Les \textbf{parcours de robots} dans les entrepôts
-    \item Les trajectoires de \textbf{machines CNC} (découpe, soudure)
-    \item La planification de tâches de maintenance
-\end{itemize}
-
 \subsection{Autres Applications}
 
 Le TSP trouve également des applications dans :
@@ -157,6 +138,7 @@ Le TSP trouve également des applications dans :
     \item La \textbf{cristallographie aux rayons X} (positionnement optimal du cristal)
 \end{itemize}
 
+\newpage
 % ==============================
 \section{Méthodes Implémentées}
 
@@ -253,6 +235,8 @@ Explorer([0], 0, \{0\})\;
 \caption{Algorithme exact Branch and Bound pour le TSP}
 \end{algorithm}
 
+\newpage
+
 \subsubsection{Complexité}
 
 La complexité de cet algorithme est \textbf{factorielle} dans le pire des cas :
@@ -278,6 +262,8 @@ La complexité de cet algorithme est \textbf{factorielle} dans le pire des cas :
 
 Cette croissance exponentielle rend l'algorithme inexploitable pour des instances de plus de 20-25 villes, même avec l'élagage. C'est pourquoi un \textbf{timeout} de 60 secondes a été imposé dans notre implémentation.
 
+
+\newpage
 % =====================================================
 \subsection{Heuristique constructive : Plus proche voisin}
 
@@ -493,7 +479,7 @@ où $k$ est le nombre d'itérations de la boucle \texttt{while}.
     \item \textbf{Complexité totale} : $\mathcal{O}(n^2 \times k)$
 \end{itemize}
 
-\textbf{Note importante :} La complexité n'est \textbf{pas} simplement $\mathcal{O}(n^2)$ comme indiqué dans la version précédente du rapport. Le facteur $k$ (nombre d'améliorations successives) peut être significatif.
+\textbf{Note importante :} La complexité n'est \textbf{pas} simplement $\mathcal{O}(n^2)$. Le facteur $k$ (nombre d'améliorations successives) peut être significatif.
 
 \subsubsection{Optimum local}
 
@@ -519,17 +505,17 @@ La meilleure solution trouvée sur toutes les itérations est conservée.
 
 \begin{center}
 \begin{tikzpicture}[
-    node distance=1.5cm,
-    box/.style={rectangle, draw, fill=blue!20, text width=3cm, align=center, rounded corners, minimum height=1cm},
-    decision/.style={diamond, draw, fill=yellow!20, text width=2cm, align=center, aspect=2}
+    node distance=2.5cm,
+    box/.style={rectangle, draw, fill=blue!20, text width=4cm, align=center, rounded corners, minimum height=1.2cm},
+    decision/.style={diamond, draw, fill=yellow!20, text width=3cm, align=center, aspect=2, minimum height=1.5cm}
 ]
     \node[box] (start) {Début};
     \node[box, below of=start] (construct) {Construction\\randomisée\\(RCL + $\alpha$)};
     \node[box, below of=construct] (improve) {Amélioration\\locale\\(2-opt)};
-    \node[decision, below of=improve] (better) {Meilleure\\solution ?};
-    \node[box, below of=better, node distance=2cm] (update) {Mettre à jour\\meilleur};
-    \node[decision, right of=better, node distance=4cm] (continue) {Plus\\d'itérations ?};
-    \node[box, below of=continue, node distance=2cm] (end) {Retourner\\meilleur};
+    \node[decision, below of=improve, node distance=3cm] (better) {Meilleure\\solution ?};
+    \node[box, below of=better, node distance=3.5cm] (update) {Mettre à jour\\meilleur};
+    \node[decision, right of=better, node distance=6.5cm] (continue) {Plus\\d'itérations ?};
+    \node[box, below of=continue, node distance=3.5cm] (end) {Retourner\\meilleur};
     
     \draw[->] (start) -- (construct);
     \draw[->] (construct) -- (improve);
@@ -542,6 +528,7 @@ La meilleure solution trouvée sur toutes les itérations est conservée.
 \end{tikzpicture}
 \end{center}
 
+\newpage
 \subsubsection{Liste Restreinte de Candidats (RCL)}
 
 Le paramètre $\alpha \in [0, 1]$ contrôle le compromis entre choix glouton et diversification :
@@ -597,6 +584,7 @@ $MeilleureSolution \leftarrow \emptyset$\;
 \caption{Méta-heuristique GRASP pour le TSP}
 \end{algorithm}
 
+\newpage
 \subsubsection{Complexité}
 
 La complexité de GRASP est :
@@ -621,8 +609,6 @@ En pratique, $I_{max}$ est fixé à une valeur raisonnable (100 dans notre impl�
 \clearpage
 % ==============================
 \section{Méthodologie de Test}
-
-Cette section décrit la méthodologie utilisée pour évaluer et comparer les performances des différents algorithmes implémentés.
 
 \subsection{Instances de Test}
 
@@ -665,7 +651,7 @@ Les tests ont été effectués sur :
 \begin{itemize}
     \item \textbf{Système d'exploitation} : macOS
     \item \textbf{Langage} : Python 3
-    \item \textbf{Processeur} : Variable selon la machine
+    \item \textbf{Processeur} : Puce M1
 \end{itemize}
 
 \subsection{Métriques Évaluées}
@@ -714,6 +700,7 @@ Le tableau suivant présente les résultats obtenus pour chaque algorithme sur l
 \label{tab:results}
 \end{table}
 
+\newpage
 \subsection{Analyse par Instance}
 
 \subsubsection{Instance 17.in (17 villes)}
@@ -746,6 +733,7 @@ Sur cette instance moyenne :
     \item \textbf{Constructive} donne une solution 17\% plus coûteuse (8980 vs 7672)
 \end{itemize}
 
+\newpage
 \subsection{Comparaison Globale des Coûts}
 
 \begin{figure}[H]
@@ -762,6 +750,7 @@ Le graphique ci-dessus montre clairement que :
     \item Sur les instances moyennes, \textbf{GRASP} tend à donner les meilleures solutions
 \end{itemize}
 
+\newpage
 \subsection{Comparaison Globale des Temps}
 
 \begin{figure}[H]
@@ -778,6 +767,9 @@ L'analyse des temps d'exécution révèle :
     \item \textbf{LocalSearch} : Très rapide ($\sim$0.025-0.096s), excellent compromis
     \item \textbf{GRASP} : Temps raisonnable (0.07-4.36s), acceptable pour la qualité obtenue
 \end{itemize}
+
+\bigskip
+\textbf{Synthèse :} L'analyse croisée des coûts et des temps d'exécution révèle une priorité d'utilisation des algorithmes. L'algorithme exact Branch and Bound, bien que garantissant l'optimalité, devient rapidement inexploitable au-delà de 20 villes en raison de sa complexité factorielle. L'heuristique constructive, malgré sa rapidité exceptionnelle, produit des solutions de qualité insuffisante (écarts de 5\% à 17\%). C'est donc vers les méthodes d'amélioration locale que notre attention se porte : \textbf{LocalSearch (2-opt)} émerge comme le meilleur compromis qualité-temps, atteignant ou s'approchant de l'optimal en moins de 0.1 seconde. GRASP, bien que légèrement plus coûteuse en temps (jusqu'à 4.36s), se distingue sur les instances moyennes où sa phase de diversification lui permet de trouver les meilleures solutions absolues. Cette analyse nous conduit à privilégier \textbf{LocalSearch pour les applications nécessitant une réponse rapide} et \textbf{GRASP lorsque la qualité de la solution prime sur le temps de calcul}.
 
 \subsection{Analyse Détaillée par Algorithme}
 
@@ -912,6 +904,7 @@ GRASP\_LS & 3398.7 & 2.605 & 1304.5 \\
 \label{tab:stats}
 \end{table}
 
+\newpage
 \textbf{Observations :}
 \begin{itemize}
     \item \textbf{GRASP} obtient le meilleur coût moyen (3398.7)
@@ -952,7 +945,7 @@ Ce projet a permis d'explorer et de comparer différents paradigmes de résoluti
     
     \item \textbf{L'heuristique constructive} du plus proche voisin offre une excellente réactivité (environ 0.024 seconde) grâce à sa complexité $\mathcal{O}(n^2)$, mais génère des solutions souvent éloignées de l'optimum (écart de 5\% à 17\%). Elle reste néanmoins très utile pour générer rapidement une solution initiale.
     
-    \item \textbf{La recherche locale (2-opt)} permet d'améliorer significativement les solutions initiales avec un surcoût computationnel très faible (0.025 à 0.096 seconde). Sa complexité réelle $\mathcal{O}(n^2 \times k)$ (et non $\mathcal{O}(n^2)$ comme initialement indiqué) reste très raisonnable en pratique. Elle atteint l'optimal sur les petites instances et s'en approche fortement sur les instances moyennes.
+    \item \textbf{La recherche locale (2-opt)} permet d'améliorer significativement les solutions initiales avec un surcoût computationnel très faible (0.025 à 0.096 seconde). Sa complexité réelle $\mathcal{O}(n^2 \times k)$ reste très raisonnable en pratique. Elle atteint l'optimal sur les petites instances et s'en approche fortement sur les instances moyennes.
     
     \item \textbf{La méta-heuristique GRASP} combine efficacement diversification (phase constructive randomisée) et intensification (recherche locale 2-opt). Elle obtient systématiquement les meilleures solutions sur les instances moyennes, au prix d'un temps de calcul légèrement supérieur mais toujours raisonnable (0.07 à 4.36 secondes).
 \end{itemize}
@@ -976,26 +969,9 @@ En fonction du contexte d'utilisation, nous recommandons :
 
 \begin{itemize}
     \item \textbf{Instances très petites ($n < 20$)} : Utiliser Branch and Bound pour garantir l'optimalité
-    \item \textbf{Instances moyennes ($20 \le n \le 100$)} : Utiliser GRASP pour la meilleure qualité, ou LocalSearch pour un résultat rapide
+    \item \textbf{Instances moyennes ($20 \le n \le 100$)} : Utiliser LocalSearch pour un résultat rapide et relativement précis
     \item \textbf{Grandes instances ($n > 100$)} : Utiliser GRASP avec un nombre d'itérations adapté
     \item \textbf{Applications temps réel} : Utiliser LocalSearch pour sa rapidité
 \end{itemize}
-
-\subsection{Perspectives d'Amélioration}
-
-Plusieurs pistes pourraient être explorées pour améliorer encore les performances :
-
-\begin{itemize}
-    \item \textbf{Variantes de recherche locale} : Implémenter 3-opt ou Lin-Kernighan pour échapper à certains optima locaux
-    \item \textbf{Parallélisation} : Exécuter plusieurs instances de GRASP en parallèle
-    \item \textbf{Méthodes hybrides} : Combiner GRASP avec d'autres méta-heuristiques (algorithmes génétiques, recuit simulé)
-    \item \textbf{Apprentissage automatique} : Utiliser l'apprentissage par renforcement pour guider la recherche
-\end{itemize}
-
-\subsection{Conclusion Générale}
-
-Ce projet a démontré l'importance de disposer d'un \textbf{portfolio d'algorithmes} pour résoudre efficacement le TSP. Aucune méthode n'est universellement supérieure : le choix dépend des contraintes spécifiques (taille de l'instance, temps disponible, qualité requise).
-
-La méta-heuristique GRASP, en combinant intelligemment construction randomisée et amélioration locale, représente actuellement le meilleur compromis pour la plupart des applications pratiques du TSP. Son coût computationnel raisonnable et sa robustesse en font un outil de choix pour l'optimisation de tournées dans des contextes industriels réels.
 
 \end{document}

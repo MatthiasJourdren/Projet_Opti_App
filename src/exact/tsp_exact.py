@@ -21,10 +21,10 @@ class TSPSolverExact:
         self.visited[0] = True
 
         # Default 30 minutes timeout
-        self.timeout = 60 
+        self.timeout = 600 
         self.start_time = None
 
-    def solve(self, timeout=60):
+    def solve(self, timeout=600):
         self.timeout = timeout
         self.start_time = time.time()
         try:
