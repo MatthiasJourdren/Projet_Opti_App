@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023) (preloaded format=pdflatex 2023.3.31)  20 JAN 2026 11:16
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023) (preloaded format=pdflatex 2023.3.31)  22 JAN 2026 15:53
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1056,17 +1056,16 @@ pdfTeX warning (ext4): destination with the same identifier (name{page.1}) has
 been already used, duplicate ignored
 <to be read again> 
                    \relax 
-l.40 ...{5.1}RÃ©sultats Bruts}{17}{subsection.5.1}
-                                                  % [1])
+l.40 ...on des Instances}{18}{subsubsection.4.1.1}
+                                                  % [1] [2])
 \tf@toc=\write5
 \openout5 = `report.toc'.
 
- [2] (./report.lof)
+ [3] (./report.lof)
 \tf@lof=\write6
 \openout6 = `report.lof'.
 
-
-[3] [4] [5]
+[4] [5] [6]
 LaTeX Font Info:    Trying to load font information for T1+lmss on input line 2
 11.
  (/usr/local/texlive/2023/texmf-dist/tex/latex/lm/t1lmss.fd
@@ -1077,97 +1076,106 @@ LaTeX Font Info:    Trying to load font information for T1+lmtt on input line 2
 
 (/usr/local/texlive/2023/texmf-dist/tex/latex/lm/t1lmtt.fd
 File: t1lmtt.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
-) [6] [7{/usr/local/texlive/2023/texmf-dist/fonts/enc/dvips/lm/lm-mathit.enc}{/
+) [7] [8{/usr/local/texlive/2023/texmf-dist/fonts/enc/dvips/lm/lm-mathit.enc}{/
 usr/local/texlive/2023/texmf-dist/fonts/enc/dvips/lm/lm-mathsy.enc}{/usr/local/
-texlive/2023/texmf-dist/fonts/enc/dvips/lm/lm-rm.enc}] [8] [9] [10] [11] [12{/u
-sr/local/texlive/2023/texmf-dist/fonts/enc/dvips/lm/lm-mathex.enc}] [13] [14] [
-15] [16
-
-] [17
+texlive/2023/texmf-dist/fonts/enc/dvips/lm/lm-rm.enc}] [9] [10] [11] [12] [13] 
+[14{/usr/local/texlive/2023/texmf-dist/fonts/enc/dvips/lm/lm-mathex.enc}] [15] 
+[16] [17] [18
 
 ]
-[18]
-<../results/plots/comparison_cost.png, id=453, 867.24pt x 433.62pt>
+[19] [20
+
+] [21]
+<../results/plots/comparison_cost.png, id=565, 867.24pt x 433.62pt>
 File: ../results/plots/comparison_cost.png Graphic file (type png)
 <use ../results/plots/comparison_cost.png>
 Package pdftex.def Info: ../results/plots/comparison_cost.png  used on input li
-ne 741.
+ne 829.
 (pdftex.def)             Requested size: 386.96027pt x 193.47969pt.
- [19 <../results/plots/comparison_cost.png>]
-<../results/plots/comparison_time.png, id=460, 867.24pt x 433.62pt>
+ [22 <../results/plots/comparison_cost.png>]
+<../results/plots/comparison_time.png, id=573, 867.24pt x 433.62pt>
 File: ../results/plots/comparison_time.png Graphic file (type png)
 <use ../results/plots/comparison_time.png>
 Package pdftex.def Info: ../results/plots/comparison_time.png  used on input li
-ne 758.
+ne 846.
 (pdftex.def)             Requested size: 386.96027pt x 193.47969pt.
-<../results/plots/performance_Exact.png, id=461, 867.24pt x 433.62pt>
+<../results/plots/performance_Exact.png, id=574, 867.24pt x 433.62pt>
 File: ../results/plots/performance_Exact.png Graphic file (type png)
 <use ../results/plots/performance_Exact.png>
 Package pdftex.def Info: ../results/plots/performance_Exact.png  used on input 
-line 780.
+line 868.
 (pdftex.def)             Requested size: 341.43307pt x 170.71892pt.
- [20 <../results/plots/comparison_time.png>]
-<../results/plots/performance_Constructive.png, id=467, 867.24pt x 433.62pt>
+ [23 <../results/plots/comparison_time.png>]
+<../results/plots/performance_Constructive.png, id=580, 867.24pt x 433.62pt>
 File: ../results/plots/performance_Constructive.png Graphic file (type png)
 <use ../results/plots/performance_Constructive.png>
 Package pdftex.def Info: ../results/plots/performance_Constructive.png  used on
- input line 796.
+ input line 884.
 (pdftex.def)             Requested size: 341.43307pt x 170.71892pt.
-<../results/plots/performance_LocalSearch.png, id=468, 867.24pt x 433.62pt>
+<../results/plots/performance_LocalSearch.png, id=581, 867.24pt x 433.62pt>
 File: ../results/plots/performance_LocalSearch.png Graphic file (type png)
 <use ../results/plots/performance_LocalSearch.png>
 Package pdftex.def Info: ../results/plots/performance_LocalSearch.png  used on 
-input line 812.
+input line 900.
 (pdftex.def)             Requested size: 341.43307pt x 170.71892pt.
- [21 <../results/plots/performance_Exact.png> <../results/plots/performance_Con
+ [24 <../results/plots/performance_Exact.png> <../results/plots/performance_Con
 structive.png>]
-<../results/plots/performance_GRASP_LS.png, id=475, 867.24pt x 433.62pt>
+<../results/plots/performance_GRASP_LS.png, id=589, 867.24pt x 433.62pt>
 File: ../results/plots/performance_GRASP_LS.png Graphic file (type png)
 <use ../results/plots/performance_GRASP_LS.png>
 Package pdftex.def Info: ../results/plots/performance_GRASP_LS.png  used on inp
-ut line 829.
+ut line 917.
 (pdftex.def)             Requested size: 341.43307pt x 170.71892pt.
-<../results/plots/instance_17.in.png, id=476, 722.7pt x 433.62pt>
+<../results/plots/instance_17.in.png, id=590, 722.7pt x 433.62pt>
 File: ../results/plots/instance_17.in.png Graphic file (type png)
 <use ../results/plots/instance_17.in.png>
 Package pdftex.def Info: ../results/plots/instance_17.in.png  used on input lin
-e 848.
+e 936.
 (pdftex.def)             Requested size: 341.43307pt x 204.86006pt.
- [22 <../results/plots/performance_LocalSearch.png> <../results/plots/performan
+ [25 <../results/plots/performance_LocalSearch.png> <../results/plots/performan
 ce_GRASP_LS.png>]
-<../results/plots/instance_51.in.png, id=483, 722.7pt x 433.62pt>
+<../results/plots/instance_51.in.png, id=597, 722.7pt x 433.62pt>
 File: ../results/plots/instance_51.in.png Graphic file (type png)
 <use ../results/plots/instance_51.in.png>
 Package pdftex.def Info: ../results/plots/instance_51.in.png  used on input lin
-e 857.
+e 945.
 (pdftex.def)             Requested size: 341.43307pt x 204.86006pt.
-<../results/plots/instance_52.in.png, id=484, 722.7pt x 433.62pt>
+<../results/plots/instance_52.in.png, id=598, 722.7pt x 433.62pt>
 File: ../results/plots/instance_52.in.png Graphic file (type png)
 <use ../results/plots/instance_52.in.png>
 Package pdftex.def Info: ../results/plots/instance_52.in.png  used on input lin
-e 866.
+e 954.
 (pdftex.def)             Requested size: 341.43307pt x 204.86006pt.
- [23 <../results/plots/instance_17.in.png> <../results/plots/instance_51.in.png
->] [24 <../results/plots/instance_52.in.png>] [25]
-Overfull \hbox (16.67117pt too wide) in paragraph at lines 950--951
+ [26 <../results/plots/instance_17.in.png> <../results/plots/instance_51.in.png
+>] [27 <../results/plots/instance_52.in.png>]
+LaTeX Font Info:    Trying to load font information for TS1+lmr on input line 1
+044.
+
+(/usr/local/texlive/2023/texmf-dist/tex/latex/lm/ts1lmr.fd
+File: ts1lmr.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
+) [28{/usr/local/texlive/2023/texmf-dist/fonts/enc/dvips/lm/lm-ts1.enc}] [29] [
+30
+
+] [31] [32]
+Overfull \hbox (16.67117pt too wide) in paragraph at lines 1228--1229
 []\T1/lmr/bx/n/12 La méta-heuristique GRASP \T1/lmr/m/n/12 com-bine ef-fi-ca-ce
 -ment di-ver-si-fi-ca-tion (phase construc-
  []
 
-[26
+[33
 
-] [27] (./report.aux)
+] [34] (./report.aux)
 Package rerunfilecheck Info: File `report.out' has not changed.
-(rerunfilecheck)             Checksum: 9D1F521974DEF3831C10E059785A4643;10602.
+(rerunfilecheck)             Checksum: EF6315AD7B8A32FCDB516AA93D5C05B2;14909.
  ) 
 Here is how much of TeX's memory you used:
- 35404 strings out of 476025
- 816827 string characters out of 5790017
- 1868388 words of memory out of 5000000
- 55144 multiletter control sequences out of 15000+600000
- 564566 words of font info for 58 fonts, out of 8000000 for 9000
+ 35504 strings out of 476025
+ 818695 string characters out of 5790017
+ 1867388 words of memory out of 5000000
+ 55201 multiletter control sequences out of 15000+600000
+ 564941 words of font info for 59 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 84i,20n,81p,1111b,1275s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 84i,20n,80p,1111b,1275s stack positions out of 10000i,1000n,20000p,200000b,200000s
 </usr/local/texlive/2023/texmf-dist/fonts/type1/public/lm/lmbx12.pfb></usr/lo
 cal/texlive/2023/texmf-dist/fonts/type1/public/lm/lmcsc10.pfb></usr/local/texli
 ve/2023/texmf-dist/fonts/type1/public/lm/lmex10.pfb></usr/local/texlive/2023/te
@@ -1179,10 +1187,10 @@ usr/local/texlive/2023/texmf-dist/fonts/type1/public/lm/lmss12.pfb></usr/local/
 texlive/2023/texmf-dist/fonts/type1/public/lm/lmsy10.pfb></usr/local/texlive/20
 23/texmf-dist/fonts/type1/public/lm/lmsy8.pfb></usr/local/texlive/2023/texmf-di
 st/fonts/type1/public/lm/lmtt12.pfb>
-Output written on report.pdf (28 pages, 550973 bytes).
+Output written on report.pdf (35 pages, 575825 bytes).
 PDF statistics:
- 603 PDF objects out of 1000 (max. 8388607)
- 524 compressed objects within 6 object streams
- 131 named destinations out of 1000 (max. 500000)
- 546 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 756 PDF objects out of 1000 (max. 8388607)
+ 668 compressed objects within 7 object streams
+ 169 named destinations out of 1000 (max. 500000)
+ 706 words of extra memory for PDF output out of 10000 (max. 10000000)
 
