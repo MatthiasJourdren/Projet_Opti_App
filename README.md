@@ -1,101 +1,182 @@
-# Projet Optimization - TSP
+# Projet TSP - Équipe 5
 
-## Team
+## Équipe
 
-- Name: Team X (Replace with actual team ID/Name if known)
+**Team 5** - Master MIASHS, IMA-UCO (2025-2026)
 
-## Structure
+---
 
-- `src/`: Source code
-  - `model/`: Graph model and shared utilities
-  - `exact/`: Branch and Bound algorithm
-  - `constructive/`: Constructive heuristic
-  - `local_search/`: Local search heuristic
-  - `grasp/`: GRASP-LS meta-heuristic (Note: Used instead of Tabu Search as per Section 5 of requirements)
-- `instances/`: Test instances and results
-- `report/`: Project report
+## 📁 Structure du Projet
 
-## Usage
-
-Each algorithm can be run from the command line from the root of the project.
-
-### Exact Method
-
-```bash
-python3 src/exact/tsp_exact.py <path_to_instance>
+```
+.
+├── README.md                    # Ce fichier
+├── report/                      # Rapport du projet
+│   ├── report_team_5.pdf       # Rapport final (35 pages)
+│   └── sources/                # Sources LaTeX et figures
+│       ├── report_team_5.tex
+│       └── figures/
+├── src/                        # Code source
+│   ├── model/                  # Modèle de graphe et utilitaires partagés
+│   ├── exact/                  # Algorithme exact (Branch and Bound)
+│   ├── constructive/           # Heuristique constructive (Plus Proche Voisin)
+│   ├── local_search/           # Recherche locale (2-opt)
+│   └── grasp/                  # Méta-heuristique GRASP
+└── instances/                  # Instances de test
+    ├── exact/                  # Instances pour Branch and Bound
+    ├── constructive/           # Instances pour heuristique constructive
+    ├── local_search/           # Instances pour recherche locale
+    ├── grasp/                  # Instances pour GRASP
+    └── new_instances/          # Nouveau jeu d'instances pour comparaison finale
 ```
 
-Example:
+---
+
+## 🚀 Utilisation
+
+### Algorithme Exact (Branch and Bound)
 
 ```bash
-python3 src/exact/tsp_exact.py instances/exact/test.in
+python3 src/exact/tsp_exact.py instances/exact/17.in
 ```
 
-### Constructive Heuristic
+**Note** : Limité aux instances ~ 20 villes.
+
+### Heuristique Constructive (Plus Proche Voisin)
 
 ```bash
-python3 src/constructive/tsp_constructive.py Data/17.in
+python3 src/constructive/tsp_constructive.py instances/constructive/17.in
 ```
 
-### Local Search
+### Recherche Locale (2-opt)
 
 ```bash
-python3 src/local_search/tsp_local_search.py Data/17.in
+python3 src/local_search/tsp_local_search.py instances/local_search/17.in
 ```
 
-### GRASP-LS
+### Méta-heuristique GRASP
 
 ```bash
-python3 src/grasp/tsp_grasp_ls.py Data/17.in
+python3 src/grasp/tsp_grasp_ls.py instances/grasp/17.in
 ```
 
-> [!NOTE]
-> Ensure you are using `python3`. The `Data` directory contains additional instances you can test with.
+### Exécution Automatisée (Benchmark)
 
-## Input Format
-
-The input file must contain `n` (number of vertices) on the first line, followed by the `n` rows of the adjacency matrix.
-
-## Output Format
-
-The program will generate a file named `{input_filename}_{method}.out` in the same directory as the input file, containing the tour and the total cost.
-
-## Automation & Tools
-
-### Benchmark
-
-To run all algorithms on the instances and generate a CSV report:
+Pour exécuter les 4 algorithmes sur plusieurs instances automatiquement :
 
 ```bash
 python3 benchmark.py --instances Data --max-instances 5
 ```
 
-The results will be saved by default to `results/results.csv`.
+**Options** :
 
-### Visualization
+- `--instances` : Dossier contenant les instances (par défaut : `Data`)
+- `--max-instances` : Nombre maximum d'instances à tester
+- `--output` : Fichier CSV de sortie (par défaut : `results/results.csv`)
 
-To generate performance charts (Cost and Time) from the benchmark results, use the plotting script:
+**Résultat** : Fichier CSV avec temps d'exécution et coûts pour chaque algorithme.
 
-```bash
-python3 plot_results.py
+---
+
+## 📥 Format d'Entrée
+
+Les fichiers d'instance (`.in`) contiennent :
+
+- Ligne 1 : `n` (nombre de villes)
+- Lignes suivantes : Coordonnées `(x, y)` de chaque ville
+
+Exemple (`17.in`) :
+
+```
+17
+565.0 575.0
+25.0 185.0
+...
 ```
 
-This will create various plots in `results/plots/`:
+---
 
-- **`comparison_cost.png`**: Global comparison of costs.
-- **`comparison_time.png`**: Global comparison of execution times.
-- **`performance_<Algorithm>.png`**: Detailed analysis per algorithm (Cost vs Time across instances).
-- **`instance_<dataset>.png`**: Detailed comparison for each specific dataset.
+## 📤 Format de Sortie
 
-> [!NOTE]
-> The plotting script requires `pandas`, `seaborn`, and `matplotlib`. If missing, install with: `pip install pandas seaborn matplotlib`.
+Chaque algorithme génère un fichier `.out` dans le même dossier que l'instance d'entrée :
 
-### Pathological Instances
+**Nom** : `{instance}_{algorithme}.out`
 
-To generate "trap" instances designed to challenge constructive heuristics:
+**Contenu** :
 
-```bash
-python3 generate_pathological.py
+```
+Tour: 0 -> 5 -> 12 -> ... -> 0
+Cost: 2085.0
 ```
 
-This will create instances in `instances/pathological/`.
+---
+
+## 📊 Instances de Test
+
+### Instances de Référence
+
+- **`instances/new_instances/`** : Jeu d'instances pour comparaison finale
+  - `17.in` : 17 villes (petite instance)
+  - `51.in` : 51 villes (instance moyenne)
+  - `52.in` : 52 villes (instance moyenne)
+  - `439.in` : 439 villes (grande instance)
+
+### Instances par Algorithme
+
+Chaque algorithme possède son propre dossier d'instances de test dans `instances/`.
+
+---
+
+## 📈 Rapport
+
+Le rapport complet (35 pages) est disponible dans `report/report_team_5.pdf`.
+
+**Contenu** :
+
+- Introduction et applications du TSP
+- Description détaillée des 4 algorithmes (principe, pseudo-code, complexité, cas pathologiques)
+- Méthodologie de test et génération des instances
+- Analyse comparative des résultats
+- Validation de la complexité théorique
+- Tests sur grande instance (439 villes)
+- Conclusions et recommandations
+
+---
+
+## 🛠️ Dépendances
+
+**Python 3** requis.
+
+Aucune dépendance externe pour les algorithmes principaux.
+
+---
+
+## 📝 Notes Importantes
+
+### Performances
+
+D'après les tests (voir rapport section 5) :
+
+- **Branch and Bound** : Optimal jusqu'à ~20 villes
+- **Constructive** : Très rapide (0.024s) mais écart 5-17% à l'optimal
+- **LocalSearch** : Excellent compromis (< 0.1s, quasi-optimal)
+- **GRASP** : Meilleures solutions sur instances moyennes (51-52 villes)
+
+Sur grande instance (439 villes) :
+
+- **LocalSearch** : Seul algorithme d'amélioration viable (292s, -13.8%)
+- **GRASP** : Timeout avec 100 itérations
+
+---
+
+## 👥 Auteurs
+
+**Équipe 5** - Master MIASHS, IMA-UCO (2025-2026)
+
+- Matthias Jourdren
+- Maxence Cornu Basset
+- Gaëtan Pezas
+
+---
+
+_Pour plus de détails, consultez le rapport complet : `report/report_team_5.pdf`_

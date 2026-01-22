@@ -198,7 +198,7 @@ def plot_benchmark_results(csv_path, output_dir):
 def main():
     parser = argparse.ArgumentParser(description="Plot benchmark results")
     parser.add_argument("--csv", default="results/results.csv", help="Path to results CSV file")
-    parser.add_argument("--output", default="results/plots", help="Directory to save plots")
+    parser.add_argument("--output", default="report/sources/figures", help="Directory to save plots")
     args = parser.parse_args()
 
     plot_benchmark_results(args.csv, args.output)
