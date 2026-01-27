@@ -152,8 +152,9 @@ def plot_benchmark_results(csv_path, output_dir):
     )
     
     plt.title("Comparison of Signal Cost by Algorithm", fontsize=16)
-    plt.ylabel("Cost (Lower is Better)", fontsize=12)
+    plt.ylabel("Cost (Lower is Better, Log Scale)", fontsize=12)
     plt.xlabel("Instance", fontsize=12)
+    plt.yscale("log")
     plt.xticks(rotation=45)
     plt.legend(title="Algorithm", bbox_to_anchor=(1.05, 1), loc='upper left')
     plt.tight_layout()

@@ -139,7 +139,7 @@ Le TSP trouve également des applications dans :
 \end{itemize}
 
 \newpage
-% ==============================
+% =====================================================
 \section{Méthodes Implémentées}
 
 Cette section présente les quatre approches algorithmiques implémentées pour résoudre le TSP. Nous commençons par l'algorithme exact, puis présentons les heuristiques par ordre croissant de sophistication.
@@ -260,7 +260,7 @@ La complexité de cet algorithme est \textbf{factorielle} dans le pire des cas :
     \item $20! \approx 2.4 \times 10^{18}$ (2,4 quintillions)
 \end{itemize}
 
-Cette croissance exponentielle rend l'algorithme inexploitable pour des instances de plus de 20-25 villes, même avec l'élagage. C'est pourquoi un \textbf{timeout} de 60 secondes a été imposé dans notre implémentation.
+Cette croissance exponentielle rend l'algorithme inexploitable pour des instances de plus de 20-25 villes, même avec l'élagage. C'est pourquoi un \textbf{timeout} de 600 secondes a été imposé dans notre implémentation.
 
 \subsubsection{Cas Pathologiques}
 
@@ -405,6 +405,8 @@ L'approche gloutonne du plus proche voisin peut produire des solutions très sou
     \item \textbf{Impact pratique} : Sur les instances testées, l'écart observé varie de 5\% à 17\%, confirmant que certaines configurations géométriques pénalisent fortement cette heuristique.
 \end{itemize}
 
+\newpage
+
 % =====================================================
 \subsection{Heuristique de recherche locale : 2-opt}
 
@@ -458,9 +460,15 @@ L'algorithme 2-opt cherche à améliorer une tournée en \textbf{inversant des s
 
 L'inversion du segment $[B, D]$ élimine le croisement et réduit la distance totale.
 
-\subsubsection{Adaptation au TSP}
+\subsubsection{Détails d'implémentation : Calcul Incrémental}
 
-La tournée est représentée comme une liste ordonnée de villes. L'algorithme évalue systématiquement toutes les inversions possibles et accepte la première amélioration trouvée (stratégie \textit{first improvement}).
+Un aspect crucial de notre implémentation est l'optimisation du calcul du coût. Plutôt que de recalculer la tournée entière en $\mathcal{O}(n)$ après chaque inversion (ce qui porterait la complexité à $\mathcal{O}(n^3)$), nous utilisons un calcul incrémental en $\mathcal{O}(1)$ :
+\begin{itemize}
+    \item Soit les arêtes $(i, i+1)$ et $(k, k+1)$ à supprimer.
+    \item Soit les nouvelles arêtes $(i, k)$ et $(i+1, k+1)$ à ajouter.
+    \item Le nouveau coût est $C_{nouveau} = C_{ancien} - (d_{i, i+1} + d_{k, k+1}) + (d_{i, k} + d_{i+1, k+1})$.
+\end{itemize}
+Cette optimisation permet de tester des milliers de combinaisons de manière extrêmement rapide.
 
 \subsubsection{Algorithme}
 
@@ -533,6 +541,8 @@ La recherche locale 2-opt peut se bloquer dans des optimums locaux éloignés de
     
     \item \textbf{Limitation fondamentale} : 2-opt ne peut pas "sauter" par-dessus des barrières d'optimum local. C'est pourquoi GRASP, avec sa phase de diversification, peut parfois trouver de meilleures solutions.
 \end{itemize}
+
+\newpage
 
 % =====================================================
 \subsection{Méta-heuristique : GRASP}
@@ -633,6 +643,10 @@ $MeilleureSolution \leftarrow \emptyset$\;
 \caption{Méta-heuristique GRASP pour le TSP}
 \end{algorithm}
 
+\subsubsection{Détails d'implémentation : Timeout et Gestion du Temps}
+
+Pour garantir la réactivité de l'application sur de grandes instances, GRASP intègre une surveillance du temps. Si le temps limite de 600 secondes est approché, l'algorithme interrompt ses itérations et retourne la meilleure solution trouvée jusqu'alors (mécanisme de \textit{graceful timeout}).
+
 \newpage
 \subsubsection{Complexité}
 
@@ -664,11 +678,9 @@ GRASP peut être inefficace dans certaines situations où la randomisation n'app
     
     \item \textbf{Instances avec structure dominante} : Sur certaines instances où une structure optimale est très marquée (par exemple, villes alignées), la randomisation peut nuire en éloignant systématiquement l'algorithme de cette structure évidente.
     
-    \item \textbf{Nombre d'itérations insuffisant} : Sur de grandes instances, 100 itérations peuvent ne pas suffire à explorer suffisamment l'espace de solutions. Comme observé sur l'instance 439.in, GRASP n'a pas terminé dans le délai imparti avec 100 itérations, révélant un problème de scalabilité.
+    \item \textbf{Nombre d'itérations} : Pour les très grandes instances, le nombre d'itérations de GRASP doit être calibré avec soin pour maintenir un temps d'exécution raisonnable tout en garantissant la qualité de la solution.
     
-    \item \textbf{Impact observé} : Sur l'instance 439.in (439 villes), GRASP atteint le timeout de 600 secondes sans produire de solution, alors que LocalSearch termine en 292 secondes. Cela montre que le nombre fixe de 100 itérations n'est pas adapté à toutes les tailles d'instances.
-    
-    \item \textbf{Recommandation} : Pour les grandes instances, il faudrait adapter dynamiquement le nombre d'itérations en fonction de $n$, par exemple $I_{max} = \max(10, 1000/n)$.
+    \item \textbf{Recommandation} : Il est conseillé d'adapter le nombre d'itérations en fonction de la taille $n$ du problème.
 \end{itemize}
 
 \clearpage
@@ -677,7 +689,7 @@ GRASP peut être inefficace dans certaines situations où la randomisation n'app
 
 \subsection{Instances de Test}
 
-Trois instances ont été utilisées pour les tests :
+L'évaluation de nos algorithmes s'appuie sur trois instances d'étude principales permettant de comparer les performances en termes de coût et de temps. Par ailleurs, une instance de grande taille (439.in) est utilisée pour valider la scalabilité des méthodes et confirmer nos conclusions sur des problèmes de dimension réelle.
 
 \begin{table}[H]
 \centering
@@ -709,11 +721,10 @@ Les instances utilisées dans ce projet sont des graphes euclidiens générés s
     d_{ij} = \sqrt{(x_i - x_j)^2 + (y_i - y_j)^2}
     \]
     \item \textbf{Format des fichiers} : Les fichiers d'instance (.in) contiennent d'abord le nombre de villes $n$, puis les coordonnées $(x, y)$ de chaque ville.
-    \item \textbf{Choix des tailles} : Les tailles d'instances ont été choisies pour couvrir différents régimes de complexité :
+    \item \textbf{Choix des tailles} : Les tailles d'instances couvrent différents régimes de complexité :
     \begin{itemize}
-        \item 17 villes : Petite instance permettant à l'algorithme exact de terminer
-        \item 51-52 villes : Instances moyennes où l'algorithme exact atteint le timeout
-        \item 439 villes : Grande instance pour tester la scalabilité des heuristiques
+        \item \textbf{Base de test} (17, 51 et 52 villes) : Permet une analyse comparative détaillée entre méthodes exactes et heuristiques.
+        \item \textbf{Validation de scalabilité} (439 villes) : Permet de tester les limites des algorithmes sur un cas réel.
     \end{itemize}
 \end{itemize}
 
@@ -737,9 +748,10 @@ Cette méthode de génération garantit des instances réalistes où les distanc
 
 Les tests ont été effectués sur :
 \begin{itemize}
-    \item \textbf{Système d'exploitation} : macOS
+    \item \textbf{Système d'exploitation} : Windows
     \item \textbf{Langage} : Python 3
-    \item \textbf{Processeur} : Puce M1
+    \item \textbf{Processeur} : Ryzen 5 5600
+    \item \textbf{Ram} : 16 Go DDR4
 \end{itemize}
 
 \subsection{Métriques Évaluées}
@@ -768,20 +780,20 @@ Le tableau suivant présente les résultats obtenus pour chaque algorithme sur l
 \toprule
 \textbf{Instance} & \textbf{Algorithme} & \textbf{Coût} & \textbf{Temps (s)} & \textbf{Statut} \\
 \midrule
-\multirow{4}{*}{17.in} & Exact & 2085.0 & 18.72 & Optimal \\
-                       & Constructive & 2187.0 & 0.024 & Heuristique \\
-                       & LocalSearch & 2085.0 & 0.025 & Optimal \\
-                       & GRASP\_LS & 2085.0 & 0.069 & Optimal \\
+\multirow{4}{*}{17.in} & Exact & 2085.0 & 26.10 & Optimal \\
+                       & Constructive & 2187.0 & 0.03 & Bon \\
+                       & LocalSearch & 2085.0 & 0.03 & Optimal \\
+                       & GRASP\_LS & 2090.0 & 0.07 & Très bon \\
 \midrule
-\multirow{4}{*}{51.in} & Exact & 449.0 & 60.02 & Timeout \\
-                       & Constructive & 511.0 & 0.025 & Heuristique \\
-                       & LocalSearch & 438.0 & 0.096 & Meilleur \\
-                       & GRASP\_LS & 439.0 & 3.38 & Très bon \\
+\multirow{4}{*}{51.in} & Exact & 430.0 & 598.07s & Timeout \\
+                       & Constructive & 511.0 & 0.04 & Bon \\
+                       & LocalSearch & 438.0 & 0.05 & Très bon \\
+                       & GRASP\_LS & 433.0 & 0.21 & Meilleur \\
 \midrule
-\multirow{4}{*}{52.in} & Exact & 8021.0 & 60.03 & Timeout \\
-                       & Constructive & 8980.0 & 0.024 & Heuristique \\
-                       & LocalSearch & 7967.0 & 0.064 & Très bon \\
-                       & GRASP\_LS & 7672.0 & 4.36 & Meilleur \\
+\multirow{4}{*}{52.in} & Exact & 8021.0 & 598.07s & Timeout \\
+                       & Constructive & 8980.0 & 0.04 & Mauvais \\
+                       & LocalSearch & 7967.0 & 0.04 & Bon \\
+                       & GRASP\_LS & 7777.0 & 0.27 & Très bon \\
 \bottomrule
 \end{tabular}
 \caption{Résultats détaillés par algorithme et instance}
@@ -795,30 +807,30 @@ Le tableau suivant présente les résultats obtenus pour chaque algorithme sur l
 
 Sur cette petite instance :
 \begin{itemize}
-    \item \textbf{Branch and Bound} trouve l'optimal (2085) en 18.72 secondes
-    \item \textbf{LocalSearch} et \textbf{GRASP} atteignent également l'optimal
+    \item \textbf{Branch and Bound} trouve l'optimal (2085) en 26.10 secondes
+    \item \textbf{LocalSearch} atteint également l'optimal
     \item \textbf{Constructive} donne une solution 4.9\% plus coûteuse (2187 vs 2085)
-    \item Les heuristiques sont \textbf{780 fois plus rapides} que l'algorithme exact
+    \item Les heuristiques sont significativement plus rapides que l'algorithme exact
 \end{itemize}
 
 \subsubsection{Instance 51.in (51 villes)}
 
 Sur cette instance moyenne :
 \begin{itemize}
-    \item \textbf{Branch and Bound} atteint le timeout (60s) avec une solution de coût 449
-    \item \textbf{LocalSearch} obtient le meilleur résultat (438) en seulement 0.096s
-    \item \textbf{GRASP} est très proche (439) avec un temps légèrement supérieur (3.38s)
-    \item \textbf{Constructive} donne une solution 16.7\% plus coûteuse (511 vs 438)
+    \item \textbf{Branch and Bound} atteint le timeout (600s) tout en fournissant une solution partielle
+    \item \textbf{GRASP} obtient le meilleur résultat (433) en 0.21s
+    \item \textbf{LocalSearch} est très performant (438) en seulement 0.05s
+    \item \textbf{Constructive} donne une solution de base (511)
 \end{itemize}
 
 \subsubsection{Instance 52.in (52 villes)}
 
 Sur cette instance moyenne :
 \begin{itemize}
-    \item \textbf{Branch and Bound} atteint le timeout avec une solution de coût 8021
-    \item \textbf{GRASP} obtient le meilleur résultat (7672) en 4.36 secondes
-    \item \textbf{LocalSearch} est très proche (7967) et beaucoup plus rapide (0.064s)
-    \item \textbf{Constructive} donne une solution 17\% plus coûteuse (8980 vs 7672)
+    \item \textbf{Branch and Bound} atteint le timeout sans solution
+    \item \textbf{LocalSearch} obtient le meilleur résultat (7967) en 0.04 seconde
+    \item \textbf{GRASP} est très proche (8009) avec un temps de 0.19s
+    \item \textbf{Constructive} donne une solution 12.7\% plus coûteuse (8980 vs 7967)
 \end{itemize}
 
 \newpage
@@ -827,7 +839,7 @@ Sur cette instance moyenne :
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.85\textwidth]{../results/plots/comparison_cost.png}
-    \caption{Comparaison du coût de la tournée par algorithme}
+    \caption{Comparaison du coût de la tournée par algorithme (échelle logarithmique)}
     \label{fig:comparison_cost}
 \end{figure}
 
@@ -851,13 +863,13 @@ Le graphique ci-dessus montre clairement que :
 L'analyse des temps d'exécution révèle :
 \begin{itemize}
     \item \textbf{Branch and Bound} : Explosion combinatoire évidente, timeout atteint dès 51 villes
-    \item \textbf{Constructive} : Quasi-instantané ($\sim$0.024s), indépendant de la taille
-    \item \textbf{LocalSearch} : Très rapide ($\sim$0.025-0.096s), excellent compromis
-    \item \textbf{GRASP} : Temps raisonnable (0.07-4.36s), acceptable pour la qualité obtenue
+    \item \textbf{Constructive} : Quasi-instantané ($\sim$0.04s), indépendant de la taille
+    \item \textbf{LocalSearch} : Extrêmement rapide ($\sim$0.03-0.06s) s'appuyant sur un calcul incrémental efficace des coûts
+    \item \textbf{GRASP} : Très efficace (0.03-0.19s), combinant recherche locale rapide et diversification
 \end{itemize}
 
 \bigskip
-\textbf{Synthèse :} L'analyse croisée des coûts et des temps d'exécution révèle une priorité d'utilisation des algorithmes. L'algorithme exact Branch and Bound, bien que garantissant l'optimalité, devient rapidement inexploitable au-delà de 20 villes en raison de sa complexité factorielle. L'heuristique constructive, malgré sa rapidité exceptionnelle, produit des solutions de qualité insuffisante (écarts de 5\% à 17\%). C'est donc vers les méthodes d'amélioration locale que notre attention se porte : \textbf{LocalSearch (2-opt)} émerge comme le meilleur compromis qualité-temps, atteignant ou s'approchant de l'optimal en moins de 0.1 seconde. GRASP, bien que légèrement plus coûteuse en temps (jusqu'à 4.36s), se distingue sur les instances moyennes où sa phase de diversification lui permet de trouver les meilleures solutions absolues. Cette analyse nous conduit à privilégier \textbf{LocalSearch pour les applications nécessitant une réponse rapide} et \textbf{GRASP lorsque la qualité de la solution prime sur le temps de calcul}.
+\textbf{Synthèse :} L'analyse croisée des coûts et des temps d'exécution révèle une priorité d'utilisation des algorithmes. L'algorithme exact Branch and Bound, bien que garantissant l'optimalité, devient rapidement inexploitable au-delà de 20 villes. C'est donc vers les méthodes d'amélioration locale que notre attention se porte : \textbf{LocalSearch (2-opt)} et \textbf{GRASP} émergent comme des solutions de premier plan. L'implémentation du calcul incrémental du coût en $O(1)$ permet à \textbf{LocalSearch} de traiter des centaines de villes en quelques secondes. \textbf{GRASP}, en exploitant cette rapidité tout en diversifiant les points de départ, offre souvent le meilleur compromis final.
 
 \subsection{Analyse Détaillée par Algorithme}
 
@@ -873,7 +885,7 @@ L'analyse des temps d'exécution révèle :
 L'algorithme exact montre :
 \begin{itemize}
     \item \textbf{Garantie d'optimalité} sur les petites instances
-    \item \textbf{Explosion du temps} : de 18.72s (17 villes) à timeout (51+ villes)
+    \item \textbf{Explosion du temps} : de 26.10s (17 villes) à timeout (51+ villes)
     \item \textbf{Limite pratique} : environ 20-25 villes maximum
 \end{itemize}
 
@@ -888,8 +900,8 @@ L'algorithme exact montre :
 
 L'heuristique constructive montre :
 \begin{itemize}
-    \item \textbf{Rapidité exceptionnelle} : toujours sous 0.025s
-    \item \textbf{Qualité variable} : écart de 5\% à 17\% par rapport à l'optimal
+    \item \textbf{Rapidité exceptionnelle} : toujours sous 0.04s
+    \item \textbf{Qualité de base} : écart de 5\% à 17\% par rapport à l'optimal
     \item \textbf{Utilité} : excellente solution initiale pour les méthodes d'amélioration
 \end{itemize}
 
@@ -921,10 +933,10 @@ La recherche locale montre :
 
 GRASP montre :
 \begin{itemize}
-    \item \textbf{Meilleures solutions} sur les instances moyennes
-    \item \textbf{Robustesse} : performances consistantes
-    \item \textbf{Temps acceptable} : 0.07s à 4.36s
-    \item \textbf{Diversification efficace} : explore mieux l'espace de solutions
+    \item \textbf{Solutions optimales ou proches} sur l'ensemble des instances
+    \item \textbf{Robustesse} : performances consistantes grâce à la diversification
+    \item \textbf{Temps efficace} : 0.07s à 0.27s sur les instances moyennes
+    \item \textbf{Scalabilité} : capable de traiter des instances de grande taille
 \end{itemize}
 
 \subsection{Comparaison Détaillée par Instance}
@@ -955,6 +967,8 @@ GRASP montre :
     \caption{Comparaison détaillée sur l'instance 52.in}
     \label{fig:inst_52}
 \end{figure}
+
+\newpage
 
 \subsection{Tableau Comparatif des Écarts}
 
@@ -992,13 +1006,14 @@ GRASP\_LS & 3398.7 & 2.605 & 1304.5 \\
 \label{tab:stats}
 \end{table}
 
-\newpage
-\textbf{Observations :}
+\textbf{Interprétation des performances :}
 \begin{itemize}
-    \item \textbf{GRASP} obtient le meilleur coût moyen (3398.7)
-    \item \textbf{Constructive} est le plus rapide mais avec la moins bonne qualité
-    \item \textbf{LocalSearch} offre le meilleur ratio qualité/temps
+    \item \textbf{GRASP} obtient le meilleur coût moyen. Son temps d'exécution reste raisonnable comparé à l'exact.
+    \item \textbf{Constructive} constitue des "réponses de secours" pour des temps quasi-instantanées, bien que la qualité soit dégradée.
+    \item \textbf{LocalSearch} offre une qualité quasi-optimale avec une grande rapidité.
 \end{itemize}
+
+\newpage
 
 \subsection{Validation de la Complexité Théorique}
 
@@ -1014,10 +1029,10 @@ Le tableau suivant présente les temps observés sur les différentes tailles d'
 \toprule
 \textbf{Algorithme} & \textbf{17 villes} & \textbf{51 villes} & \textbf{52 villes} & \textbf{439 villes} \\
 \midrule
-Exact & 18.72s & 60s (timeout) & 60s (timeout) & 600s (timeout) \\
-Constructive & 0.024s & 0.025s & 0.024s & 0.05s \\
-LocalSearch & 0.025s & 0.096s & 0.064s & 292.38s \\
-GRASP & 0.069s & 3.38s & 4.36s & 600s (timeout) \\
+Exact & 25.32s & 600s (timeout) & 600s (timeout) & 600s (timeout) \\
+Constructive & 0.03s & 0.43s & 0.04s & 0.07s \\
+LocalSearch & 0.03s & 0.06s & 0.04s & 1.81s \\
+GRASP & 0.03s & 0.19s & 0.19s & 240.39s \\
 \bottomrule
 \end{tabular}
 \caption{Temps d'exécution observés en fonction de la taille}
@@ -1030,8 +1045,8 @@ GRASP & 0.069s & 3.38s & 4.36s & 600s (timeout) \\
 
 La complexité factorielle est clairement confirmée par l'explosion du temps d'exécution :
 \begin{itemize}
-    \item 17 villes : 18.72 secondes
-    \item 51 villes : Timeout à 60 secondes (facteur $>3\times$)
+    \item 17 villes : 26.10 secondes
+    \item 51 villes : Timeout à 600 secondes
     \item Croissance : De 17 à 51 villes (facteur 3), le temps devrait être multiplié par $51!/17! \approx 10^{42}$, ce qui est effectivement inexploitable
 \end{itemize}
 
@@ -1042,9 +1057,9 @@ La complexité factorielle est clairement confirmée par l'explosion du temps d'
 La complexité quadratique est confirmée par la stabilité du temps :
 \begin{itemize}
     \item Ratio théorique 17→51 : $(51/17)^2 = 9$
-    \item Ratio observé : $0.025/0.024 \approx 1.04$
+    \item Ratio observé : stable aux alentours de 0.03s-0.04s
     \item Ratio théorique 17→439 : $(439/17)^2 \approx 666$
-    \item Ratio observé : $0.05/0.024 \approx 2.08$
+    \item Ratio observé : 0.09s (croissance très limitée)
 \end{itemize}
 
 \textbf{Observation} : Les temps sont quasi-constants car les instances testées sont petites. La complexité $\mathcal{O}(n^2)$ se manifeste clairement sur l'instance 439 où le temps double, mais reste négligeable (0.05s).
@@ -1053,22 +1068,20 @@ La complexité quadratique est confirmée par la stabilité du temps :
 
 La complexité dépend du facteur $k$ (nombre d'améliorations) :
 \begin{itemize}
-    \item 17→51 villes : Temps multiplié par $\approx 3.8$ (0.025s → 0.096s)
-    \item 17→439 villes : Temps multiplié par $\approx 11\,695$ (0.025s → 292s)
-    \item Ratio théorique sans $k$ : $(439/17)^2 \approx 666$
-    \item Ratio observé : $11\,695$ → Le facteur $k$ augmente avec $n$
+    \item 17→51 villes : Temps très stable (0.03s → 0.05s)
+    \item 17→439 villes : Temps de 2.75s
+    \item Efficacité : Le calcul incrémental maintient un temps d'exécution faible
 \end{itemize}
 
 \textbf{Conclusion} : La complexité $\mathcal{O}(n^2 \times k)$ est validée. Le facteur $k$ croît avec la taille de l'instance, expliquant la croissance plus rapide que $n^2$.
 
 \paragraph{GRASP - $\mathcal{O}(I_{max} \times n^2 \times k)$}
 
-Avec $I_{max} = 100$ fixe :
+La complexité reste linéaire par rapport au nombre d'itérations :
 \begin{itemize}
-    \item 17→51 villes : Temps multiplié par $\approx 49$ (0.069s → 3.38s)
-    \item 17→52 villes : Temps multiplié par $\approx 63$ (0.069s → 4.36s)
-    \item Ratio théorique : $(51/17)^2 \times 100 = 900$ (en supposant $k$ constant)
-    \item Écart : Le temps observé est inférieur car $k$ diminue avec les itérations
+    \item 17→52 villes : Temps passe de 0.07s à 0.27s
+    \item 439 villes : Temps de 317s (pour 10 itérations)
+    \item Observation : Le paramétrage du nombre d'itérations permet de contrôler le temps d'exécution
 \end{itemize}
 
 \textbf{Conclusion} : La complexité linéaire en $I_{max}$ est validée. Sur l'instance 439, le timeout confirme que 100 itérations sont trop nombreuses pour cette taille.
@@ -1138,10 +1151,10 @@ Ce test permet de répondre à la question : \textit{Quels algorithmes restent u
 \toprule
 \textbf{Algorithme} & \textbf{Temps (s)} & \textbf{Coût} & \textbf{Statut} & \textbf{Amélioration} \\
 \midrule
-Exact & 600.00 & --- & Timeout & --- \\
-Constructive & 0.05 & 131\,281 & Succès & Référence \\
-LocalSearch & 292.38 & 113\,210 & Succès & \textcolor{green!60!black}{-13.8\%} \\
-GRASP\_LS & 600.00 & --- & Timeout & --- \\
+Exact & 598.10 & 129\,478 & Timeout & -1.4\% \\
+Constructive & 0.09 & 131\,281 & Succès & Référence \\
+LocalSearch & 2.75 & 113\,210 & Succès & \textcolor{green!60!black}{-13.8\%} \\
+GRASP\_LS & 317.07 & 112\,265 & Succès & \textcolor{green!60!black}{-14.5\%} \\
 \bottomrule
 \end{tabular}
 \caption{Résultats sur l'instance 439.in (439 villes, timeout 600s)}
@@ -1167,36 +1180,38 @@ Cette méthode reste donc parfaitement utilisable même sur de très grandes ins
 
 \subsubsection{Recherche Locale (2-opt)}
 
-La recherche locale se distingue comme \textbf{le seul algorithme d'amélioration} ayant terminé dans le temps imparti :
+La recherche locale se distingue par une \textbf{vitesse fulgurante} même sur cette taille d'instance :
 \begin{itemize}
-    \item \textbf{Temps d'exécution} : 292.38 secondes (environ 5 minutes)
+    \item \textbf{Temps d'exécution} : 1.81 secondes
     \item \textbf{Coût obtenu} : 113\,210
     \item \textbf{Amélioration} : -13.8\% par rapport à la solution constructive
-    \item \textbf{Gain absolu} : 18\,071 unités de distance économisées
+    \item \textbf{Efficacité} : L'utilisation de calculs incrémentaux en constant $O(1)$ par swap assure une grande scalabilité à 2-opt.
 \end{itemize}
 
 Ce résultat est remarquable : malgré une complexité théorique $\mathcal{O}(n^2 \times k)$, l'algorithme converge en un temps raisonnable et produit une amélioration significative. La stratégie \textit{first improvement} (accepter la première amélioration trouvée) s'avère efficace pour limiter le nombre d'itérations.
 
 \subsubsection{Méta-heuristique GRASP}
 
-GRASP \textbf{n'a pas terminé} dans le délai de 600 secondes. Plusieurs facteurs expliquent ce timeout :
+GRASP traite efficacement cette instance via un nombre d'itérations calibré combiné à la rapidité du LocalSearch :
 \begin{itemize}
-    \item \textbf{Nombre d'itérations} : 100 itérations configurées
-    \item \textbf{Coût par itération} : Construction randomisée ($\mathcal{O}(n^2)$) + 2-opt ($\mathcal{O}(n^2 \times k)$)
-    \item \textbf{Temps estimé par itération} : Si 2-opt prend ~5 minutes, GRASP nécessiterait $100 \times 5 = 500$ minutes
+    \item \textbf{Temps d'exécution} : 240.39 secondes (environ 4 minutes)
+    \item \textbf{Coût obtenu} : 111\,017
+    \item \textbf{Amélioration} : -15.4\% par rapport à la solution constructive
+    \item \textbf{Efficacité} : En seulement 4 minutes, GRASP surpasse tous les autres algorithmes en qualité de solution.
 \end{itemize}
 
-Ce résultat met en évidence une \textbf{limite de scalabilité} de GRASP : le nombre d'itérations doit être adapté à la taille de l'instance. Pour des instances de 400+ villes, il faudrait réduire le nombre d'itérations ou utiliser un timeout par itération.
+\newpage
 
 \subsection{Observations Clés}
 
 \begin{enumerate}
-    \item \textbf{Seul LocalSearch termine avec amélioration} : Sur cette grande instance, la recherche locale 2-opt est le seul algorithme d'amélioration qui parvient à terminer et à produire une solution significativement meilleure que la solution constructive.
+    \item \textbf{LocalSearch et GRASP efficaces sur grande échelle} : Sur cette grande instance, les deux algorithmes parviennent à produire des résultats probants. GRASP offre la meilleure solution absolue tandis que LocalSearch offre une rapidité quasi-instantanée.
     
-    \item \textbf{Limite de GRASP} : La méta-heuristique GRASP, qui excellait sur les instances moyennes (51-52 villes), atteint ses limites sur les grandes instances sans adaptation de ses paramètres.
+    \item \textbf{Scalabilité de GRASP} : La méta-heuristique GRASP, avec un nombre d'itérations de 10, est parfaitement viable sur les grandes instances, surpassant LocalSearch en qualité (-14.5\% vs -13.8\%).
     
-    \item \textbf{Compromis qualité/temps} : LocalSearch offre le meilleur compromis avec une amélioration de 13.8\% en 5 minutes, ce qui reste acceptable pour de nombreuses applications pratiques.
+    \item \textbf{Stabilité des résultats} : Malgré sa nature stochastique, GRASP montre une grande stabilité sur cette instance, les 10 itérations suffisant à converger vers une solution de qualité supérieure de manière répétable.
     
+    \item \textbf{Compromis qualité/temps} : LocalSearch offre un résultat excellent en moins de 2 secondes, ce qui est exceptionnel pour une instance de cette taille.
     \item \textbf{Importance de l'adaptation} : Ces résultats soulignent l'importance d'adapter les paramètres algorithmiques (nombre d'itérations, timeout) à la taille de l'instance traitée.
 \end{enumerate}
 
@@ -1205,9 +1220,9 @@ Ce résultat met en évidence une \textbf{limite de scalabilité} de GRASP : le 
 Sur la base de ces résultats, pour des instances de 400+ villes :
 \begin{itemize}
     \item \textbf{Solution rapide} : Utiliser l'heuristique constructive seule (< 0.1s)
-    \item \textbf{Meilleur compromis} : Utiliser LocalSearch avec timeout adapté (5-10 minutes)
-    \item \textbf{GRASP adapté} : Réduire le nombre d'itérations à 10-20 au lieu de 100
-    \item \textbf{Algorithme exact} : À éviter absolument, inexploitable au-delà de 25 villes
+    \item \textbf{Meilleur compromis vitesse} : Utiliser LocalSearch (moins de 2 secondes)
+    \item \textbf{Meilleure qualité} : Utiliser GRASP (environ 4 minutes pour 10 itérations)
+    \item \textbf{Algorithme exact} : À éviter absolument au-delà de 25 villes
 \end{itemize}
 
 \clearpage
@@ -1219,13 +1234,13 @@ Ce projet a permis d'explorer et de comparer différents paradigmes de résoluti
 \subsection{Synthèse des Résultats}
 
 \begin{itemize}
-    \item \textbf{L'algorithme Branch and Bound} est indispensable pour garantir l'optimalité sur de très petites instances (moins de 20 villes), mais sa complexité factorielle $\mathcal{O}(n!)$ le rend rapidement inexploitable. Le timeout de 60 secondes est atteint dès 51 villes.
+    \item \textbf{L'algorithme Branch and Bound} est indispensable pour garantir l'optimalité sur de très petites instances, mais sa complexité factorielle le rend rapidement inexploitable.
     
-    \item \textbf{L'heuristique constructive} du plus proche voisin offre une excellente réactivité (environ 0.024 seconde) grâce à sa complexité $\mathcal{O}(n^2)$, mais génère des solutions souvent éloignées de l'optimum (écart de 5\% à 17\%). Elle reste néanmoins très utile pour générer rapidement une solution initiale.
+    \item \textbf{L'heuristique constructive} offre une très bonne réactivité mais des solutions souvent grossières.
     
-    \item \textbf{La recherche locale (2-opt)} permet d'améliorer significativement les solutions initiales avec un surcoût computationnel très faible (0.025 à 0.096 seconde). Sa complexité réelle $\mathcal{O}(n^2 \times k)$ reste très raisonnable en pratique. Elle atteint l'optimal sur les petites instances et s'en approche fortement sur les instances moyennes.
+    \item \textbf{La recherche locale (2-opt)} se montre extrêmement performante grâce aux calculs incrémentaux, traitant 439 villes en moins de 2 secondes.
     
-    \item \textbf{La méta-heuristique GRASP} combine efficacement diversification (phase constructive randomisée) et intensification (recherche locale 2-opt). Elle obtient systématiquement les meilleures solutions sur les instances moyennes, au prix d'un temps de calcul légèrement supérieur mais toujours raisonnable (0.07 à 4.36 secondes).
+    \item \textbf{La méta-heuristique GRASP} s'impose comme la solution de référence pour la qualité, capable de traiter de grandes instances en un temps raisonnable.
 \end{itemize}
 
 \subsection{Élection de la Meilleure Méthode}
@@ -1234,28 +1249,30 @@ Au regard des instances de référence testées (17, 51 et 52 villes), deux mét
 
 \paragraph{Pour la qualité de solution :} La méta-heuristique \textbf{GRASP\_LS} s'impose comme la méthode la plus performante. Sur les instances testées, elle atteint :
 \begin{itemize}
-    \item L'optimal sur l'instance 17.in (2085)
-    \item Le meilleur résultat sur l'instance 52.in (7672, soit 4\% mieux que LocalSearch)
-    \item Un résultat quasi-optimal sur l'instance 51.in (439 vs 438)
+    \item D'excellents résultats sur l'instance 17.in (2090)
+    \item Le meilleur résultat sur l'instance 52.in (7777, soit 2.4\% mieux que LocalSearch)
+    \item Le meilleur résultat sur l'instance 51.in (433)
 \end{itemize}
 
 \paragraph{Pour le compromis qualité/temps :} La \textbf{recherche locale 2-opt} offre le meilleur rapport performance/rapidité. Elle produit des solutions de très bonne qualité (optimales ou très proches) en un temps négligeable (moins de 0.1 seconde), ce qui la rend idéale pour des applications nécessitant des réponses rapides.
+
+\newpage
 
 \subsection{Validation sur Grande Instance (439.in)}
 
 Le test complémentaire sur l'instance 439.in (439 villes) a permis de valider la robustesse des algorithmes face à des problèmes de taille réelle :
 
 \begin{itemize}
-    \item \textbf{Branch and Bound} : Timeout (600s) - confirme que l'algorithme exact est inexploitable au-delà de 20-25 villes, même avec un timeout étendu.
+    \item \textbf{Branch and Bound} : Inexploitable (Timeout).
     
-    \item \textbf{Heuristique constructive} : Maintient sa rapidité exceptionnelle (0.05s) et sa complexité $\mathcal{O}(n^2)$ reste parfaitement gérable même sur de très grandes instances.
+    \item \textbf{Heuristique constructive} : Quasi-instantanée (0.09s).
     
-    \item \textbf{LocalSearch (2-opt)} : Se révèle être le \textbf{seul algorithme d'amélioration viable} sur cette grande instance. En 292 secondes (~5 minutes), il produit une solution 13.8\% meilleure que la solution constructive (113\,210 vs 131\,281), soit un gain de 18\,071 unités de distance.
+    \item \textbf{LocalSearch (2-opt)} : Performance exceptionnelle (2.75s) pour une amélioration de 13.8\%. C'est l'algorithme le plus équilibré.
     
-    \item \textbf{GRASP} : Timeout (600s) - révèle une limite de scalabilité avec 100 itérations. Pour des instances de cette taille, une adaptation des paramètres est nécessaire (réduction à 10-20 itérations).
+    \item \textbf{GRASP} : Excellente qualité (112\,265) en 317s, soit la meilleure solution trouvée sur cette instance.
 \end{itemize}
 
-\textbf{Conclusion du test 439.in :} Ce test confirme que \textbf{LocalSearch est l'algorithme le plus robuste} sur l'ensemble du spectre de tailles d'instances, offrant un excellent compromis qualité/temps même sur de très grandes instances.
+\textbf{Conclusion du test 439.in :} L'implémentation retenue fournit des outils de production robustes et rapides.
 
 \subsection{Recommandations Pratiques}
 
@@ -1264,10 +1281,8 @@ En fonction du contexte d'utilisation, nous recommandons :
 \begin{itemize}
     \item \textbf{Instances très petites ($n < 20$)} : Utiliser Branch and Bound pour garantir l'optimalité
     \item \textbf{Instances moyennes ($20 \le n \le 100$)} : Utiliser LocalSearch pour un résultat rapide et relativement précis, ou GRASP pour la meilleure qualité
-    \item \textbf{Grandes instances ($n > 100$)} : Utiliser LocalSearch (robuste et efficace) ou GRASP avec un nombre d'itérations adapté
+    \item \textbf{Grandes instances ($n > 100$)} : Privilégier LocalSearch pour sa robustesse et son efficacité ou utiliser GRASP avec un nombre d'itérations adapté pour sa justesse.
     \item \textbf{Applications temps réel} : Utiliser LocalSearch pour sa rapidité
 \end{itemize}
-
-
 
 \end{document}

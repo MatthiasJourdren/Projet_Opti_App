@@ -8,44 +8,46 @@ from src.model.graph import Graph
 from src.model.utils import write_solution
 from src.constructive.tsp_constructive import nearest_neighbor
 
-def two_opt_swap(route, i, k):
-    """
-    Performs a 2-opt swap by reversing the segment route[i:k+1].
-    Indices are based on the route list.
-    """
-    new_route = route[0:i]
-    new_route.extend(route[i:k+1][::-1])
-    new_route.extend(route[k+1:])
-    return new_route
-
 def local_search_2opt(graph, initial_tour):
-    best_tour = initial_tour
+    """
+    Optimized 2-opt local search that uses incremental cost calculation.
+    Complexity: O(n^2) per restart.
+    """
+    best_tour = list(initial_tour)
+    n = len(best_tour)
+    current_cost = graph.calculate_tour_cost(best_tour)
     improved = True
     
-    n = len(best_tour)
+    dist = graph.get_weight
     
     while improved:
         improved = False
-        current_cost = graph.calculate_tour_cost(best_tour)
-        
-        # Iterate over all possible segments to reverse
-        # Edges involved are (i-1, i) and (k, k+1)
-        # We try to replace them with (i-1, k) and (i, k+1)
-        # Nodes in tour: 0..n-1
         for i in range(1, n - 1):
-            for k in range(i + 1, n):
-                new_tour = two_opt_swap(best_tour, i, k)
-                new_cost = graph.calculate_tour_cost(new_tour)
+            for j in range(i + 1, n):
+                # We pick edges (i-1, i) and (j, j_next)
+                # And try to replace them with (i-1, j) and (i, j_next)
+                # Note: this reverse the segment tour[i...j]
                 
-                if new_cost < current_cost:
-                    best_tour = new_tour
+                j_next = (j + 1) % n
+                
+                # Non-adjacent edges requirement
+                if j_next == i - 1:
+                    continue
+                    
+                # delta = cost_new - cost_old
+                delta = dist(best_tour[i-1], best_tour[j]) + dist(best_tour[i], best_tour[j_next]) \
+                      - dist(best_tour[i-1], best_tour[i]) - dist(best_tour[j], best_tour[j_next])
+                
+                if delta < -1e-9:
+                    # Apply swap (reverse segment)
+                    best_tour[i:j+1] = best_tour[i:j+1][::-1]
+                    current_cost += delta
                     improved = True
-                    # First improvement strategy
-                    break 
+                    break # First improvement strategy
             if improved:
                 break
                 
-    return best_tour, graph.calculate_tour_cost(best_tour)
+    return best_tour, current_cost
 
 def main():
     if len(sys.argv) < 2:

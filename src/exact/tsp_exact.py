@@ -1,6 +1,7 @@
 import sys
 import os
 import time
+import argparse
 
 # Add src to python path to import model
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..'))
@@ -181,23 +182,25 @@ class TSPSolverExact:
             self.visited[next_node] = False
 
 def main():
-    if len(sys.argv) < 2:
-        print("Usage: python src/exact/tsp_exact.py <input_file>")
-        sys.exit(1)
+    parser = argparse.ArgumentParser(description="Exact TSP Solver (Branch and Bound)")
+    parser.add_argument("input_file", help="Path to the input file")
+    parser.add_argument("--timeout", type=int, default=600, help="Timeout in seconds")
+    args = parser.parse_args()
 
-    input_filepath = sys.argv[1]
     try:
-        graph = Graph.load_from_file(input_filepath)
+        graph = Graph.load_from_file(args.input_file)
         solver = TSPSolverExact(graph)
-        best_path, best_cost = solver.solve()
+        best_path, best_cost = solver.solve(timeout=args.timeout)
         
         print(f"Optimal Tour: {best_path}")
         print(f"Optimal Cost: {best_cost}")
         
-        write_solution(input_filepath, "exact", best_path, best_cost)
+        write_solution(args.input_file, "exact", best_path, best_cost)
         
     except Exception as e:
         print(f"Error: {e}")
+        import traceback
+        traceback.print_exc()
         sys.exit(1)
 
 if __name__ == "__main__":

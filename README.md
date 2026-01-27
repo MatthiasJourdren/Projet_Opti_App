@@ -70,7 +70,7 @@ python3 benchmark.py --instances Data --max-instances 5
 
 **Options** :
 
-- `--instances` : Dossier contenant les instances (par défaut : `Data`)
+- `--instances` : Dossier contenant les instances (par défaut : `instances/new_instances`)
 - `--max-instances` : Nombre maximum d'instances à tester
 - `--output` : Fichier CSV de sortie (par défaut : `results/results.csv`)
 
@@ -157,15 +157,15 @@ Aucune dépendance externe pour les algorithmes principaux.
 
 D'après les tests (voir rapport section 5) :
 
-- **Branch and Bound** : Optimal jusqu'à ~20 villes
-- **Constructive** : Très rapide (0.024s) mais écart 5-17% à l'optimal
-- **LocalSearch** : Excellent compromis (< 0.1s, quasi-optimal)
-- **GRASP** : Meilleures solutions sur instances moyennes (51-52 villes)
+- **Branch and Bound** : Optimal jusqu'à ~20 villes. Retourne la meilleure solution trouvée sur timeout pour les plus grandes instances.
+- **Constructive** : Très rapide (0.04s) mais écart 5-17% à l'optimal.
+- **LocalSearch** : Excellent compromis (< 0.1s sur instances moyennes, quasi-optimal).
+- **GRASP** : Meilleures solutions sur instances moyennes (51-52 villes).
 
 Sur grande instance (439 villes) :
 
-- **LocalSearch** : Seul algorithme d'amélioration viable (292s, -13.8%)
-- **GRASP** : Timeout avec 100 itérations
+- **LocalSearch** : Extrêmement rapide (~2s) grâce au calcul incrémental.
+- **GRASP** : Excellente qualité en un temps maîtrisé (~4-5 minutes pour 10 itérations).
 
 ---
 

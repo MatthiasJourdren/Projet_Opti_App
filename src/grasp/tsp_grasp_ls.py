@@ -2,6 +2,7 @@ import sys
 import os
 import random
 import time
+import argparse
 
 # Add src to python path
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..'))
@@ -12,63 +13,60 @@ from src.local_search.tsp_local_search import local_search_2opt
 
 def randomized_nearest_neighbor(graph, alpha=0.1):
     n = graph.n
-    visited = [False] * n
+    unvisited = list(range(n))
+    
     # Start at a random node
-    start_node = random.randint(0, n - 1)
+    start_node = random.choice(unvisited)
+    unvisited.remove(start_node)
+    
     current_node = start_node
-    visited[current_node] = True
     path = [current_node]
     cost = 0
 
-    for _ in range(n - 1):
+    dist_fn = graph.get_weight
+
+    while unvisited:
+        # Find distances to all unvisited neighbors
         candidates = []
         min_dist = float('inf')
         max_dist = float('-inf')
 
-        # Find all unvisited neighbors and their distances
-        for neighbor in range(n):
-            if not visited[neighbor]:
-                dist = graph.get_weight(current_node, neighbor)
-                candidates.append((neighbor, dist))
-                if dist < min_dist:
-                    min_dist = dist
-                if dist > max_dist:
-                    max_dist = dist
-        
-        if not candidates:
-             break
+        for neighbor in unvisited:
+            dist = dist_fn(current_node, neighbor)
+            candidates.append((neighbor, dist))
+            if dist < min_dist:
+                min_dist = dist
+            if dist > max_dist:
+                max_dist = dist
 
-        # Filter by RCL
-        # threshold = min_dist + alpha * (max_dist - min_dist)
-        # Using simple percent deviation might be safer if max is huge, but standard is range.
+        # Restricted Candidate List (RCL)
         threshold = min_dist + alpha * (max_dist - min_dist)
-        
         rcl = [c for c in candidates if c[1] <= threshold]
         
-        if not rcl:
-            # Should not happen given logic, but fall back to best
-            rcl = [min(candidates, key=lambda x: x[1])]
-
         # Pick random from RCL
         next_node, dist = random.choice(rcl)
             
-        visited[next_node] = True
         path.append(next_node)
+        unvisited.remove(next_node)
         cost += dist
         current_node = next_node
 
     # Return to start
-    cost += graph.get_weight(current_node, path[0])
+    cost += dist_fn(current_node, path[0])
     
     return path, cost
 
-def grasp_ls(graph, max_iterations=50, alpha=0.2):
+def grasp_ls(graph, max_iterations=10, alpha=0.2, timeout=600):
     best_tour = []
     best_cost = float('inf')
     
-    # Time limit could be added
+    start_time = time.time()
     
     for i in range(max_iterations):
+        if time.time() - start_time > timeout:
+            # print(f"Timeout reached at iteration {i}")
+            break
+            
         # Phase 1: Constructive
         candidate_tour, candidate_cost = randomized_nearest_neighbor(graph, alpha)
         
@@ -83,25 +81,22 @@ def grasp_ls(graph, max_iterations=50, alpha=0.2):
     return best_tour, best_cost
 
 def main():
-    if len(sys.argv) < 2:
-        print("Usage: python src/grasp/tsp_grasp_ls.py <input_file>")
-        sys.exit(1)
-
-    input_filepath = sys.argv[1]
-    # Set seed for reproducibility if needed, or leave random
-    # random.seed(42) 
+    parser = argparse.ArgumentParser(description="GRASP TSP Solver with Local Search")
+    parser.add_argument("input_file", help="Path to the input file")
+    parser.add_argument("--timeout", type=int, default=600, help="Timeout in seconds")
+    parser.add_argument("--iterations", type=int, default=10, help="Number of iterations")
+    parser.add_argument("--alpha", type=float, default=0.3, help="RCL alpha parameter")
+    args = parser.parse_args()
     
     try:
-        graph = Graph.load_from_file(input_filepath)
+        graph = Graph.load_from_file(args.input_file)
         
-        # Parameters (could be args)
-        # alpha and max_iterations can be tuned.
-        tour, cost = grasp_ls(graph, max_iterations=20, alpha=0.3)
+        tour, cost = grasp_ls(graph, max_iterations=args.iterations, alpha=args.alpha, timeout=args.timeout)
         
         print(f"Tour: {tour}")
         print(f"Cost: {cost}")
         
-        write_solution(input_filepath, "grasp_ls", tour, cost)
+        write_solution(args.input_file, "grasp_ls", tour, cost)
         
     except Exception as e:
         print(f"Error: {e}")

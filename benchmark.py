@@ -14,12 +14,17 @@ ALGORITHMS = {
     "GRASP_LS": "src/grasp/tsp_grasp_ls.py"
 }
 
-def get_algorithm_command(algo_name, instance_path):
+def get_algorithm_command(algo_name, instance_path, timeout=None):
     script_path = ALGORITHMS[algo_name]
-    return [sys.executable, script_path, instance_path]
+    cmd = [sys.executable, script_path, instance_path]
+    if timeout and algo_name in ["Exact", "GRASP_LS"]:
+        # Give the algorithm slightly less time than the subprocess timeout 
+        # to ensure it can exit gracefully and print its final result.
+        cmd.extend(["--timeout", str(max(1, int(timeout - 2)))])
+    return cmd
 
 def run_algorithm(algo_name, instance_path, timeout=60):
-    command = get_algorithm_command(algo_name, instance_path)
+    command = get_algorithm_command(algo_name, instance_path, timeout=timeout)
     start_time = time.time()
     try:
         # Run the command with a timeout
@@ -50,10 +55,10 @@ def run_algorithm(algo_name, instance_path, timeout=60):
 
 def main():
     parser = argparse.ArgumentParser(description="Benchmark TSP algorithms")
-    parser.add_argument("--instances", default="Data", help="Directory containing .in files")
+    parser.add_argument("--instances", default="instances/new_instances", help="Directory containing .in files")
     parser.add_argument("--output", default="results/results.csv", help="Output CSV file")
     parser.add_argument("--max-instances", type=int, default=None, help="Max number of instances to test per algorithm")
-    parser.add_argument("--timeout", type=int, default=300, help="Timeout in seconds per run")
+    parser.add_argument("--timeout", type=int, default=600, help="Timeout in seconds per run")
     args = parser.parse_args()
 
     # Find instances
